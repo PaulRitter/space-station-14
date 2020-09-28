@@ -208,6 +208,7 @@
   - godmode
   - deleteewi
   - hurt
+  - salvagetest
   CanViewVar: true
   CanAdminPlace: true
   CanScript: true
