@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Diagnostics.CodeAnalysis;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Serialization;
@@ -8,6 +9,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Atmos
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class MovedByPressureComponent : Component
     {
         public override string Name => "MovedByPressure";

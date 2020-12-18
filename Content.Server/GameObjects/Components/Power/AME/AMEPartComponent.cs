@@ -2,6 +2,7 @@
 using System.Linq;
 using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.Interfaces.GameObjects.Components.Items;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -16,6 +17,7 @@ namespace Content.Server.GameObjects.Components.Power.AME
 {
     [RegisterComponent]
     [ComponentReference(typeof(IInteractUsing))]
+    [IgnoreOnClient]
     public class AMEPartComponent : Component, IInteractUsing
     {
         [Dependency] private readonly IMapManager _mapManager = default!;

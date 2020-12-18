@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Content.Server.GameObjects.EntitySystems;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.Components.Items;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -20,6 +21,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Weapon.Melee
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class MeleeWeaponComponent : Component, IAttack
     {
         [Dependency] private readonly IPhysicsManager _physicsManager = default!;

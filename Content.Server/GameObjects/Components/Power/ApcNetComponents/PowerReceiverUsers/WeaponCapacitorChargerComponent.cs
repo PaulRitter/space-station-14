@@ -1,4 +1,5 @@
 ﻿using Content.Server.GameObjects.Components.Weapon.Ranged.Barrels;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.GameObjects;
@@ -11,6 +12,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
     [RegisterComponent]
     [ComponentReference(typeof(IActivate))]
     [ComponentReference(typeof(BaseCharger))]
+    [IgnoreOnClient]
     public sealed class WeaponCapacitorChargerComponent : BaseCharger
     {
         public override string Name => "WeaponCapacitorCharger";

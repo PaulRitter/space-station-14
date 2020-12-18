@@ -5,6 +5,7 @@ using Content.Server.Interfaces.GameObjects;
 using Content.Shared.Alert;
 using Content.Shared.Atmos;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.Components.Mobs;
 using Robust.Shared.GameObjects;
@@ -15,6 +16,7 @@ namespace Content.Server.GameObjects.Components.Atmos
     ///     Barotrauma: injury because of changes in air pressure.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class BarotraumaComponent : Component
     {
         public override string Name => "Barotrauma";

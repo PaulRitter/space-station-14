@@ -1,5 +1,6 @@
 ﻿using Content.Server.Explosions;
 using Content.Server.GameObjects.EntitySystems;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
@@ -7,6 +8,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Explosion
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class ExplosiveComponent : Component, ITimerTrigger, IDestroyAct
     {
         public override string Name => "Explosive";

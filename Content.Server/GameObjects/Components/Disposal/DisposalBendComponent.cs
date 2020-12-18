@@ -1,4 +1,5 @@
-﻿using Robust.Shared.GameObjects;
+﻿using Content.Shared.GameObjects;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
 using Robust.Shared.Serialization;
 
@@ -6,6 +7,7 @@ namespace Content.Server.GameObjects.Components.Disposal
 {
     [RegisterComponent]
     [ComponentReference(typeof(IDisposalTubeComponent))]
+    [IgnoreOnClient]
     public class DisposalBendComponent : DisposalTubeComponent
     {
         private int _sideDegrees;

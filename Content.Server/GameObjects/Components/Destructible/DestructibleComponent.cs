@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -17,6 +18,7 @@ namespace Content.Server.GameObjects.Components.Destructible
     ///     and triggers thresholds when reached.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class DestructibleComponent : Component
     {
         [Dependency] private readonly IRobustRandom _random = default!;

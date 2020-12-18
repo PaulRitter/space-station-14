@@ -1,11 +1,13 @@
 ﻿using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Clothing;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Inventory;
 using Robust.Shared.GameObjects;
 
 namespace Content.Server.GameObjects.Components.Mobs
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class HeatResistanceComponent : Component
     {
         public override string Name => "HeatResistance";

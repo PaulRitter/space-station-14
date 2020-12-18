@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.Audio;
@@ -13,6 +14,7 @@ namespace Content.Server.GameObjects.Components.Sound
     /// Simple sound emitter that emits sound on use in hand
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class EmitSoundOnUseComponent : Component, IUse
     {
         /// <inheritdoc />

@@ -5,6 +5,7 @@ using Content.Server.Atmos;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.Interfaces;
 using Content.Shared.Atmos;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body;
 using Robust.Server.GameObjects.Components.Container;
 using Robust.Shared.Containers;
@@ -19,6 +20,7 @@ namespace Content.Server.GameObjects.Components.Disposal
 {
     // TODO: Add gas
     [RegisterComponent]
+    [IgnoreOnClient]
     public class DisposalHolderComponent : Component, IGasMixtureHolder
     {
         public override string Name => "DisposalHolder";

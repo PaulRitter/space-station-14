@@ -6,6 +6,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components.Access
 {
+    [IgnoreOnClient]
     public class SharedIdCardConsoleComponent : Component
     {
         public override string Name => "IdCardConsole";

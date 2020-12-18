@@ -11,6 +11,7 @@ using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.GameObjects.Components.Mobs;
 using Content.Server.GameObjects.EntitySystems;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.Components.Doors;
@@ -34,6 +35,7 @@ namespace Content.Server.GameObjects.Components.Doors
 {
     [RegisterComponent]
     [ComponentReference(typeof(IActivate))]
+    [IgnoreOnClient]
     public class ServerDoorComponent : Component, IActivate, ICollideBehavior, IInteractUsing
     {
         public override string Name => "Door";

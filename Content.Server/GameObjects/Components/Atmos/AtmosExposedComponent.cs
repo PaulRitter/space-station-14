@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using Content.Server.Atmos;
 using Content.Server.GameObjects.Components.Temperature;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.ComponentDependencies;
 using Robust.Shared.ViewVariables;
@@ -11,6 +12,7 @@ namespace Content.Server.GameObjects.Components.Atmos
     /// Represents that entity can be exposed to Atmos
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AtmosExposedComponent
     : Component
     {

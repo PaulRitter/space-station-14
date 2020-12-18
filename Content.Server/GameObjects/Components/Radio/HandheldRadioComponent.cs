@@ -2,6 +2,7 @@
 using Content.Server.GameObjects.EntitySystems;
 using Content.Server.Interfaces;
 using Content.Server.Interfaces.Chat;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -19,6 +20,7 @@ namespace Content.Server.GameObjects.Components.Radio
     [RegisterComponent]
     [ComponentReference(typeof(IRadio))]
     [ComponentReference(typeof(IListen))]
+    [IgnoreOnClient]
     public class HandheldRadioComponent : Component, IUse, IListen, IRadio, IActivate, IExamine
     {
         [Dependency] private readonly IChatManager _chatManager = default!;

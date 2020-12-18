@@ -1,4 +1,5 @@
 #nullable enable
+using Content.Shared.GameObjects;
 using Content.Shared.Roles;
 using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.GameObjects;
@@ -9,6 +10,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Access
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PresetIdCardComponent : Component, IMapInit
     {
         public override string Name => "PresetIdCard";

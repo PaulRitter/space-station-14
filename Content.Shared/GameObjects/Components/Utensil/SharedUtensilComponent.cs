@@ -12,6 +12,7 @@ namespace Content.Shared.GameObjects.Components.Utensil
         Knife = 1 << 2
     }
 
+    [IgnoreOnClient]
     public class SharedUtensilComponent : Component
     {
         public override string Name => "Utensil";

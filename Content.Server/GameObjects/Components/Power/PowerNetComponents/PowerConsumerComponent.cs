@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Content.Server.GameObjects.Components.NodeContainer.NodeGroups;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 using Robust.Shared.ViewVariables;
@@ -8,6 +9,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Power.PowerNetComponents
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PowerConsumerComponent : BasePowerNetComponent
     {
         public override string Name => "PowerConsumer";

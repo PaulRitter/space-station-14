@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Items;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components.Timers;
@@ -15,6 +16,7 @@ namespace Content.Server.GameObjects.Components.Timing
     /// Timer that creates a cooldown each time an object is activated/used
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class UseDelayComponent : Component
     {
         public override string Name => "UseDelay";

@@ -2,6 +2,7 @@
 using Content.Server.GameObjects.Components.Buckle;
 using Content.Server.GameObjects.Components.Mobs;
 using Content.Shared.Alert;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Mobs;
 using Content.Shared.GameObjects.Components.Movement;
 using Content.Shared.GameObjects.Components.Strap;
@@ -21,6 +22,7 @@ namespace Content.Server.GameObjects.Components.Movement
 {
     [RegisterComponent]
     [ComponentReference(typeof(IMoverComponent))]
+    [IgnoreOnClient]
     internal class ShuttleControllerComponent : Component, IMoverComponent
     {
         [Dependency] private readonly IMapManager _mapManager = default!;

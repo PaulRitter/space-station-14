@@ -1,4 +1,5 @@
 ﻿using System;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
 using Robust.Shared.Serialization;
@@ -7,6 +8,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Power
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class BatteryComponent : Component
     {
         public override string Name => "Battery";

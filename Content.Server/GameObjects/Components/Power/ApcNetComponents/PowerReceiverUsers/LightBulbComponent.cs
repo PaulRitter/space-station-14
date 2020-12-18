@@ -1,5 +1,6 @@
 ﻿using System;
 using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
 using Robust.Server.GameObjects.EntitySystems;
@@ -32,6 +33,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
     ///     Component that represents a light bulb. Can be broken, or burned, which turns them mostly useless.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class LightBulbComponent : Component, ILand
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

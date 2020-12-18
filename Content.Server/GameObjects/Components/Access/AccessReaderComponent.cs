@@ -6,6 +6,7 @@ using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.Interfaces;
 using Content.Server.Interfaces.GameObjects.Components.Items;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Inventory;
 using JetBrains.Annotations;
 using Robust.Shared.GameObjects;
@@ -21,6 +22,7 @@ namespace Content.Server.GameObjects.Components.Access
     /// </summary>
     [PublicAPI]
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AccessReader : Component
     {
         public override string Name => "AccessReader";

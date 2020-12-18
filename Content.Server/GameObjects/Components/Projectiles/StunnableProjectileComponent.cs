@@ -1,4 +1,5 @@
 using Content.Server.GameObjects.Components.Mobs;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components;
 using Robust.Shared.Interfaces.GameObjects;
@@ -11,6 +12,7 @@ namespace Content.Server.GameObjects.Components.Projectiles
     /// Adds stun when it collides with an entity
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public sealed class StunnableProjectileComponent : Component, ICollideBehavior
     {
         public override string Name => "StunnableProjectile";

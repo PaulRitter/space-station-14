@@ -1,4 +1,5 @@
-﻿using Content.Shared.GameObjects.EntitySystems;
+﻿using Content.Shared.GameObjects;
+using Content.Shared.GameObjects.EntitySystems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Localization;
 using Robust.Shared.Serialization;
@@ -8,6 +9,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Markers
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public sealed class WarpPointComponent : Component, IExamine
     {
         public override string Name => "WarpPoint";

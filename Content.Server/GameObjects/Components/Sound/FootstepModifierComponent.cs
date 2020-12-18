@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.Audio;
 using Robust.Shared.GameObjects;
@@ -15,6 +16,7 @@ namespace Content.Server.GameObjects.Components.Sound
     /// Changes footstep sound
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class FootstepModifierComponent : Component
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

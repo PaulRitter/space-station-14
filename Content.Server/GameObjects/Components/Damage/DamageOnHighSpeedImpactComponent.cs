@@ -2,6 +2,7 @@
 using Content.Server.GameObjects.Components.Mobs;
 using Content.Shared.Audio;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -17,6 +18,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Damage
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class DamageOnHighSpeedImpactComponent : Component, ICollideBehavior
     {
         [Dependency] private readonly IRobustRandom _robustRandom = default!;

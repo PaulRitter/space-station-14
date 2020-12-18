@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
@@ -16,6 +17,7 @@ namespace Content.Server.GameObjects.Components.Chemistry
     /// (DrinkComponent adds a SolutionComponent if one isn't present).
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     class PourableComponent : Component, IInteractUsing
     {
         public override string Name => "Pourable";
@@ -91,7 +93,7 @@ namespace Content.Server.GameObjects.Components.Chemistry
                 Owner.PopupMessage(eventArgs.User, Loc.GetString("{0:theName} is full!", toSolution.Owner));
                 return false;
             }
-            
+
             //Move units from attackSolution to targetSolution
             var removedSolution = fromSolution.SplitSolution(realTransferAmount);
 

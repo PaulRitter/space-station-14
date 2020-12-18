@@ -1,9 +1,11 @@
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
 
 namespace Content.Server.GameObjects.Components
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class StressTestMovementComponent : Component
     {
         public override string Name => "StressTestMovement";

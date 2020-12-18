@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Content.Server.Interfaces.GameObjects.Components.Items;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -13,6 +14,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Items.RCD
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class RCDAmmoComponent : Component, IAfterInteract, IExamine
     {
         public override string Name => "RCDAmmo";

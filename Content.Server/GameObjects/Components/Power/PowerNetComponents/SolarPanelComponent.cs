@@ -1,5 +1,6 @@
 ﻿using System;
 using Content.Server.GameObjects.EntitySystems;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
@@ -15,6 +16,7 @@ namespace Content.Server.GameObjects.Components.Power.PowerNetComponents
     ///     It generates power from the sun based on coverage.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class SolarPanelComponent : Component, IBreakAct
     {
         public override string Name => "SolarPanel";

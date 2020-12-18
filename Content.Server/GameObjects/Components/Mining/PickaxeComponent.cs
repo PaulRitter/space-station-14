@@ -1,9 +1,11 @@
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
 namespace Content.Server.GameObjects.Components.Mining
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PickaxeComponent : Component
 
     {

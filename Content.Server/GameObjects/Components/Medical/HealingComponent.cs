@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Stack;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -12,6 +13,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Medical
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class HealingComponent : Component, IAfterInteract
     {
         public override string Name => "Healing";

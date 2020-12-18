@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using Content.Server.GameObjects.EntitySystems;
 using Content.Shared.Atmos;
+using Content.Shared.GameObjects;
 using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components.Transform;
@@ -14,6 +15,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Atmos
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AirtightComponent : Component, IMapInit
     {
         private (GridId, Vector2i) _lastPosition;

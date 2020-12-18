@@ -5,6 +5,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components
 {
+    [IgnoreOnClient]
     public class SharedPaperComponent : Component
     {
         public override string Name => "Paper";

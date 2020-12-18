@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Power;
 using Content.Shared.Utility;
 using Robust.Server.GameObjects;
@@ -15,6 +16,7 @@ namespace Content.Server.GameObjects.Components.Power.PowerNetComponents
     ///     Code interfacing with the powernet is handled in <see cref="BatteryStorageComponent"/> and <see cref="BatteryDischargerComponent"/>.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class SmesComponent : Component
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;

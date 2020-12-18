@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.Components.Weapon.Ranged.Barrels;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Weapons.Ranged.Barrels;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -20,6 +21,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Ammunition
     /// Used to load certain ranged weapons quickly
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class SpeedLoaderComponent : Component, IAfterInteract, IInteractUsing, IMapInit, IUse
     {
         public override string Name => "SpeedLoader";

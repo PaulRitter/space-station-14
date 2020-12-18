@@ -3,6 +3,7 @@ using System;
 using Content.Server.GameObjects.Components.NodeContainer.NodeGroups;
 using Content.Server.GameObjects.Components.Power.PowerNetComponents;
 using Content.Server.Utility;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Power;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
@@ -20,6 +21,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
 {
     [RegisterComponent]
     [ComponentReference(typeof(IActivate))]
+    [IgnoreOnClient]
     public class ApcComponent : BaseApcNetComponent, IActivate
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;

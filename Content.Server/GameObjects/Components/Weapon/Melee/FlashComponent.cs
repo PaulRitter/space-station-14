@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Content.Server.GameObjects.Components.Mobs;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Mobs;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces;
@@ -21,6 +22,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Weapon.Melee
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class FlashComponent : MeleeWeaponComponent, IUse, IExamine
     {
         public override string Name => "Flash";

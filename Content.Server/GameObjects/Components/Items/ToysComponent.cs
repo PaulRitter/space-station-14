@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.Audio;
@@ -14,6 +15,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Items
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class ToysComponent : Component, IActivate, IUse, ILand
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

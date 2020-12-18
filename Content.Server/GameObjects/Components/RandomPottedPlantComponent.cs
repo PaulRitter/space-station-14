@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Content.Shared.GameObjects;
 using JetBrains.Annotations;
 using Robust.Server.GameObjects;
 using Robust.Server.Interfaces.GameObjects;
@@ -11,6 +12,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class RandomPottedPlantComponent : Component, IMapInit
     {
         public override string Name => "RandomPottedPlant";

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Content.Server.GameTicking;
 using Content.Server.Interfaces.GameTicking;
+using Content.Shared.GameObjects;
 using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.Random;
@@ -15,6 +16,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Markers
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class ConditionalSpawnerComponent : Component, IMapInit
     {
         [Dependency] private readonly IGameTicker _gameTicker = default!;

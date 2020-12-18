@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Interactable;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -11,6 +12,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Damage
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class DamageOnToolInteractComponent : Component, IInteractUsing
     {
         public override string Name => "DamageOnToolInteract";

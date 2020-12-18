@@ -8,6 +8,7 @@ using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.GameObjects.Components.Stack;
 using Content.Server.GameObjects.EntitySystems.DoAfter;
 using Content.Shared.Construction;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -28,6 +29,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Construction
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public partial class ConstructionComponent : Component, IExamine, IInteractUsing
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

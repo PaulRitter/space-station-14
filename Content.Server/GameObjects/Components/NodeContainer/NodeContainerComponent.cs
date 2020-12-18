@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Content.Server.GameObjects.Components.NodeContainer.Nodes;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 using Robust.Shared.ViewVariables;
@@ -10,6 +11,7 @@ namespace Content.Server.GameObjects.Components.NodeContainer
     ///     Creates and maintains a set of <see cref="Node"/>s.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class NodeContainerComponent : Component
     {
         public override string Name => "NodeContainer";

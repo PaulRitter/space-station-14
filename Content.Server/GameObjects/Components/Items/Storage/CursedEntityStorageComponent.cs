@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -14,6 +15,7 @@ namespace Content.Server.GameObjects.Components.Items.Storage
     [ComponentReference(typeof(IActivate))]
     [ComponentReference(typeof(IStorageComponent))]
     [RegisterComponent]
+    [IgnoreOnClient]
     public class CursedEntityStorageComponent : EntityStorageComponent
     {
          [Dependency] private readonly IRobustRandom _robustRandom = default!;

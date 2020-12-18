@@ -1,4 +1,5 @@
 ﻿using System;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
 
@@ -7,6 +8,7 @@ namespace Content.Server.GameObjects.Components.Disposal
     // TODO: Different types of tubes eject in random direction with no exit point
     [RegisterComponent]
     [ComponentReference(typeof(IDisposalTubeComponent))]
+    [IgnoreOnClient]
     public class DisposalTransitComponent : DisposalTubeComponent
     {
         public override string Name => "DisposalTransit";

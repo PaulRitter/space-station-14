@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.GameObjects.Components.Stack;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
@@ -13,6 +14,7 @@ namespace Content.Server.GameObjects.Components.Power
     ///     Allows the attached entity to be destroyed by a cutting tool, dropping a piece of wire.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class WireComponent : Component, IInteractUsing
     {
         public override string Name => "Wire";

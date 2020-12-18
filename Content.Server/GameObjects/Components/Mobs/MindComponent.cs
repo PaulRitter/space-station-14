@@ -4,6 +4,7 @@ using Content.Server.GameObjects.Components.Observer;
 using Content.Server.Interfaces.GameTicking;
 using Content.Server.Mobs;
 using Content.Server.Utility;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.Components.Mobs.State;
@@ -26,6 +27,7 @@ namespace Content.Server.GameObjects.Components.Mobs
     ///     Stores a <see cref="Server.Mobs.Mind"/> on a mob.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class MindComponent : Component, IExamine
     {
         private bool _showExamineInfo;

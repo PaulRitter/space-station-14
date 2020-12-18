@@ -4,6 +4,7 @@ using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.Components.MachineLinking;
 using Content.Server.GameObjects.Components.Power.ApcNetComponents;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Conveyor;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.GameObjects.Components.MachineLinking;
@@ -24,6 +25,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Conveyor
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class ConveyorComponent : Component, ISignalReceiver<TwoWayLeverSignal>, ISignalReceiver<bool>
     {
         public override string Name => "Conveyor";

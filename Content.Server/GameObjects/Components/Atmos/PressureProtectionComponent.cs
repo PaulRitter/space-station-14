@@ -1,4 +1,5 @@
 ﻿using Content.Server.Interfaces.GameObjects;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 using Robust.Shared.ViewVariables;
@@ -6,6 +7,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Atmos
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PressureProtectionComponent : Component, IPressureProtection
     {
         public override string Name => "PressureProtection";

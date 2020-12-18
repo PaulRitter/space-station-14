@@ -6,6 +6,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components.Power
 {
+    [IgnoreOnClient]
     public class SharedSolarControlConsoleComponent : Component
     {
         public override string Name => "SolarControlConsole";

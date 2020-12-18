@@ -1,4 +1,5 @@
-﻿using Content.Shared.GameObjects.Components.Power;
+﻿using Content.Shared.GameObjects;
+using Content.Shared.GameObjects.Components.Power;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Utility;
 using Robust.Server.GameObjects;
@@ -16,6 +17,7 @@ namespace Content.Server.GameObjects.Components.Power
     /// </summary>
     [RegisterComponent]
     [ComponentReference(typeof(BatteryComponent))]
+    [IgnoreOnClient]
     public class PowerCellComponent : BatteryComponent, IExamine
     {
         public override string Name => "PowerCell";

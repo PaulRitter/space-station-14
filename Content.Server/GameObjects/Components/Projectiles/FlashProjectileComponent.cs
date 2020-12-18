@@ -1,4 +1,5 @@
 using Content.Server.GameObjects.Components.Weapon;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components;
 using Robust.Shared.Interfaces.GameObjects;
@@ -10,6 +11,7 @@ namespace Content.Server.GameObjects.Components.Projectiles
     /// Upon colliding with an object this will flash in an area around it
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class FlashProjectileComponent : Component, ICollideBehavior
     {
         public override string Name => "FlashProjectile";

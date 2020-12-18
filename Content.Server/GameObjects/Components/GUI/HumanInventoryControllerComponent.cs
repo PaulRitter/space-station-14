@@ -1,4 +1,5 @@
 using Content.Server.GameObjects.Components.Items.Storage;
+using Content.Shared.GameObjects;
 using Robust.Server.GameObjects.Components.Container;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components.Timers;
@@ -12,6 +13,7 @@ namespace Content.Server.GameObjects.Components.GUI
     // Handles the special behavior of pockets/ID card slot and their relation to uniforms.
     [RegisterComponent]
     [ComponentReference(typeof(IInventoryController))]
+    [IgnoreOnClient]
     public class HumanInventoryControllerComponent : Component, IInventoryController
     {
         public override string Name => "HumanInventoryController";

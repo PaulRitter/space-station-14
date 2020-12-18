@@ -1,5 +1,6 @@
 using System;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.Physics;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -21,6 +22,7 @@ namespace Content.Server.GameObjects.Components.Projectiles
     /// Lasers etc.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class HitscanComponent : Component
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;

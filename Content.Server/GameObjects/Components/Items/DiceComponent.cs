@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
@@ -18,6 +19,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Items
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class DiceComponent : Component, IActivate, IUse, ILand, IExamine
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

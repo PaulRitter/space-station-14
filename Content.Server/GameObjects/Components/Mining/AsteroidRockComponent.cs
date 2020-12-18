@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Weapon.Melee;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
@@ -15,6 +16,7 @@ using Robust.Shared.Random;
 namespace Content.Server.GameObjects.Components.Mining
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AsteroidRockComponent : Component, IInteractUsing
     {
         [Dependency] private readonly IRobustRandom _random = default!;

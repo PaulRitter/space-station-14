@@ -5,6 +5,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components.Command
 {
+    [IgnoreOnClient]
     public class SharedCommunicationsConsoleComponent : Component
     {
         public override string Name => "CommunicationsConsole";

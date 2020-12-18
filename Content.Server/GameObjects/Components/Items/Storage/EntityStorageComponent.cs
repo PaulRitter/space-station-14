@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Interactable;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.GameObjects.Components.Storage;
@@ -31,6 +32,7 @@ namespace Content.Server.GameObjects.Components.Items.Storage
     [RegisterComponent]
     [ComponentReference(typeof(IActivate))]
     [ComponentReference(typeof(IStorageComponent))]
+    [IgnoreOnClient]
     public class EntityStorageComponent : Component, IActivate, IStorageComponent, IInteractUsing, IDestroyAct, IActionBlocker, IExAct
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;

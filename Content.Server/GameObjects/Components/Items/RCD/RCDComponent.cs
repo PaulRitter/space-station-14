@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.GameObjects.EntitySystems.DoAfter;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -25,6 +26,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Items.RCD
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class RCDComponent : Component, IAfterInteract, IUse, IExamine
     {
         [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;

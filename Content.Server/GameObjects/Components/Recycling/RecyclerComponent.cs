@@ -4,6 +4,7 @@ using Content.Server.GameObjects.Components.Conveyor;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.Components.Power.ApcNetComponents;
 using Content.Shared.Construction;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body;
 using Content.Shared.GameObjects.Components.Recycling;
 using Content.Shared.Physics;
@@ -21,6 +22,7 @@ namespace Content.Server.GameObjects.Components.Recycling
 {
     // TODO: Add sound and safe beep
     [RegisterComponent]
+    [IgnoreOnClient]
     public class RecyclerComponent : Component, ICollideBehavior
     {
         public override string Name => "Recycler";

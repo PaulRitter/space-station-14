@@ -2,6 +2,7 @@
 using Content.Server.AI.Utility.AiLogic;
 using Content.Server.GameObjects.EntitySystems.AI;
 using Content.Server.Interfaces.GameTicking;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Movement;
 using Content.Shared.Roles;
 using Robust.Shared.GameObjects;
@@ -17,6 +18,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Movement
 {
     [RegisterComponent, ComponentReference(typeof(IMoverComponent))]
+    [IgnoreOnClient]
     public class AiControllerComponent : Component, IMoverComponent
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

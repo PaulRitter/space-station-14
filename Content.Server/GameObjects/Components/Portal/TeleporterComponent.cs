@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Portal;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
@@ -23,7 +24,8 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Portal
 {
     [RegisterComponent]
-    public class TeleporterComponent : Component, IAfterInteract 
+    [IgnoreOnClient]
+    public class TeleporterComponent : Component, IAfterInteract
     {
         [Dependency] private readonly IServerEntityManager _serverEntityManager = default!;
         [Dependency] private readonly IRobustRandom _spreadRandom = default!;

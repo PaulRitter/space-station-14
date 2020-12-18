@@ -4,6 +4,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components
 {
+    [IgnoreOnClient]
     public class SharedComputerComponent : Component
     {
         public override string Name => "Computer";

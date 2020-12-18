@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Content.Server.GameObjects.Components.NodeContainer.NodeGroups;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Serialization;
@@ -22,6 +23,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
     }
 
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PowerProviderComponent : BaseApcNetComponent, IPowerProvider
     {
         public override string Name => "PowerProvider";

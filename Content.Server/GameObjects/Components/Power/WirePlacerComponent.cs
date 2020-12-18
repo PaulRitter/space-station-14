@@ -9,10 +9,12 @@ using Robust.Shared.IoC;
 using Robust.Shared.Serialization;
 using Robust.Shared.ViewVariables;
 using System.Threading.Tasks;
+using Content.Shared.GameObjects;
 
 namespace Content.Server.GameObjects.Components.Power
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     internal class WirePlacerComponent : Component, IAfterInteract
     {
         [Dependency] private readonly IMapManager _mapManager = default!;

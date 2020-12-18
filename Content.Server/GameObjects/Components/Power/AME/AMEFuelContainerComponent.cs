@@ -1,9 +1,11 @@
-﻿using Robust.Shared.GameObjects;
+﻿using Content.Shared.GameObjects;
+using Robust.Shared.GameObjects;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Power.AME
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AMEFuelContainerComponent : Component
     {
         public override string Name => "AMEFuelContainer";

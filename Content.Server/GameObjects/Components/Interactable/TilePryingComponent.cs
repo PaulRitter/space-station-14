@@ -9,10 +9,12 @@ using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Serialization;
 using System.Threading.Tasks;
+using Content.Shared.GameObjects;
 
 namespace Content.Server.GameObjects.Components.Interactable
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class TilePryingComponent : Component, IAfterInteract
     {
         [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;

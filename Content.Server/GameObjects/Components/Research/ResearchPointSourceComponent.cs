@@ -1,4 +1,5 @@
 ﻿using Content.Server.GameObjects.Components.Power.ApcNetComponents;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
@@ -8,6 +9,7 @@ namespace Content.Server.GameObjects.Components.Research
 {
     [RegisterComponent]
     [ComponentReference(typeof(IActivate))]
+    [IgnoreOnClient]
     public class ResearchPointSourceComponent : ResearchClientComponent
     {
         public override string Name => "ResearchPointSource";

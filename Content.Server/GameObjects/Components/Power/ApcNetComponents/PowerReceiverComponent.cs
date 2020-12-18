@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using Content.Server.GameObjects.Components.NodeContainer.NodeGroups;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Power;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Server.GameObjects;
@@ -20,6 +21,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
     ///     Attempts to link with a nearby <see cref="IPowerProvider"/>s so that it can receive power from a <see cref="IApcNet"/>.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PowerReceiverComponent : Component, IExamine
     {
         [Dependency] private readonly IServerEntityManager _serverEntityManager = default!;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components.Timers;
 using Robust.Shared.Interfaces.GameObjects;
@@ -14,6 +15,7 @@ using Timer = Robust.Shared.Timers.Timer;
 namespace Content.Server.GameObjects.Components.Markers
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class TimedSpawnerComponent : Component
     {
         [Dependency] private readonly IRobustRandom _robustRandom = default!;

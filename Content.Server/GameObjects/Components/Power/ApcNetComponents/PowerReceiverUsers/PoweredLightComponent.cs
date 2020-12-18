@@ -6,6 +6,7 @@ using Content.Server.GameObjects.Components.MachineLinking;
 using Content.Server.GameObjects.Components.MachineLinking.Signals;
 using Content.Server.GameObjects.Components.Mobs;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
@@ -29,6 +30,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
     ///     Component that represents a wall light. It has a light bulb that can be replaced when broken.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PoweredLightComponent : Component, IInteractHand, IInteractUsing, IMapInit, ISignalReceiver<bool>, ISignalReceiver<ToggleSignal>
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;

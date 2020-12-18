@@ -6,6 +6,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components.Body.Scanner
 {
+    [IgnoreOnClient]
     public abstract class SharedBodyScannerComponent : Component
     {
         public override string Name => "BodyScanner";

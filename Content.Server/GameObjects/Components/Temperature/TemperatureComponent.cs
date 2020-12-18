@@ -4,6 +4,7 @@ using Content.Server.GameObjects.Components.Mobs;
 using Content.Shared.Alert;
 using Content.Shared.Atmos;
 using Content.Shared.Damage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Damage;
 using Content.Shared.GameObjects.Components.Mobs;
 using Robust.Shared.GameObjects;
@@ -19,6 +20,7 @@ namespace Content.Server.GameObjects.Components.Temperature
     /// and taking fire damage from high temperature.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class TemperatureComponent : Component
     {
         /// <inheritdoc />

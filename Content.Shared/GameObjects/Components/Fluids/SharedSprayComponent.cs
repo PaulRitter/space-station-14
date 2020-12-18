@@ -4,6 +4,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components.Fluids
 {
+    [IgnoreOnClient]
     public class SharedSprayComponent : Component
     {
         public override string Name => "Spray";

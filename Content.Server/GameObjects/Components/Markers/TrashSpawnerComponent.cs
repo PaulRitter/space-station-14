@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Interfaces.Random;
@@ -12,6 +13,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Markers
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class TrashSpawnerComponent : ConditionalSpawnerComponent
     {
         [Dependency] private readonly IRobustRandom _robustRandom = default!;

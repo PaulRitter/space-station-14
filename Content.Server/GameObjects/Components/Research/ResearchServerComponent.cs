@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Content.Server.GameObjects.Components.Power.ApcNetComponents;
 using Content.Server.GameObjects.EntitySystems;
+using Content.Shared.GameObjects;
 using Content.Shared.Research;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Systems;
@@ -10,6 +11,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Research
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class ResearchServerComponent : Component
     {
         public static int ServerCount = 0;

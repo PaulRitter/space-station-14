@@ -5,6 +5,7 @@ using Content.Server.GameObjects.Components.Metabolism;
 using Content.Server.Interfaces;
 using Content.Shared.Atmos;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body.Networks;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
@@ -14,6 +15,7 @@ namespace Content.Server.GameObjects.Components.Body.Circulatory
 {
     [RegisterComponent]
     [ComponentReference(typeof(SharedBloodstreamComponent))]
+    [IgnoreOnClient]
     public class BloodstreamComponent : SharedBloodstreamComponent, IGasMixtureHolder
     {
         public override string Name => "Bloodstream";

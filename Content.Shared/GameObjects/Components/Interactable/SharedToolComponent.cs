@@ -33,6 +33,7 @@ namespace Content.Shared.GameObjects.Components.Interactable
         }
     }
 
+    [IgnoreOnClient]
     public class SharedToolComponent : Component
     {
         public override string Name => "Tool";

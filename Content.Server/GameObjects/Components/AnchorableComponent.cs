@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.Utility;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
@@ -15,6 +16,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AnchorableComponent : Component, IInteractUsing
     {
         public override string Name => "Anchorable";

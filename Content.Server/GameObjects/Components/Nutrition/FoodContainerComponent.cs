@@ -2,6 +2,7 @@
 using System.Linq;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Nutrition;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
@@ -20,6 +21,7 @@ namespace Content.Server.GameObjects.Components.Nutrition
     /// TODO: Perhaps implement putting food back (pizza boxes) but that really isn't mandatory.
     /// This doesn't even need to have an actual Container for right now.
     [RegisterComponent]
+    [IgnoreOnClient]
     public sealed class FoodContainer : SharedFoodContainerComponent, IUse
     {
         [Dependency] private readonly IRobustRandom _random = default!;

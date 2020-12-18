@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Linq;
 using Content.Server.GameObjects.Components.Power.ApcNetComponents;
+using Content.Shared.GameObjects;
 using Robust.Server.GameObjects;
 using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.GameObjects;
@@ -16,6 +17,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.BarSign
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class BarSignComponent : Component, IMapInit
     {
         public override string Name => "BarSign";

@@ -7,6 +7,7 @@ using Content.Server.GameObjects.Components.Mobs;
 using Content.Server.GameObjects.Components.Power;
 using Content.Server.Interfaces.GameObjects.Components.Items;
 using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
@@ -29,6 +30,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Weapon.Melee
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class StunbatonComponent : MeleeWeaponComponent, IUse, IExamine, IInteractUsing, IThrowCollide
     {
         [Dependency] private readonly IRobustRandom _robustRandom = default!;

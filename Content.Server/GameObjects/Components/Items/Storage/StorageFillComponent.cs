@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Content.Shared.GameObjects;
 using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.GameObjects;
@@ -13,6 +14,7 @@ using Logger = Robust.Shared.Log.Logger;
 namespace Content.Server.GameObjects.Components.Items.Storage
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     internal sealed class StorageFillComponent : Component, IMapInit
     {
         public override string Name => "StorageFill";

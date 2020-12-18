@@ -8,10 +8,12 @@ using Robust.Shared.ViewVariables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Content.Shared.GameObjects;
 
 namespace Content.Server.GameObjects.Components.Weapon.Melee
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class MeleeChemicalInjectorComponent : Component
     {
         public override string Name => "MeleeChemicalInjector";

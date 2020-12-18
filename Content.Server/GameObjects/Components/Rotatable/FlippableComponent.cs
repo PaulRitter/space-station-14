@@ -1,4 +1,5 @@
 #nullable enable
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
@@ -11,6 +12,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Rotatable
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class FlippableComponent : Component
     {
         public override string Name => "Flippable";

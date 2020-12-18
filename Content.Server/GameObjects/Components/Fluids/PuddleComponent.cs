@@ -5,6 +5,7 @@ using System.Threading;
 using Content.Server.GameObjects.Components.Chemistry;
 using Content.Server.GameObjects.Components.Movement;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Maps;
 using Content.Shared.Physics;
@@ -32,6 +33,7 @@ namespace Content.Server.GameObjects.Components.Fluids
     /// Puddle on a floor
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PuddleComponent : Component, IExamine, IMapInit
     {
         // Current design: Something calls the SpillHelper.Spill, that will either

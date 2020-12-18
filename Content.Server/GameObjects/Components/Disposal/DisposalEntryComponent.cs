@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Interfaces.Random;
 using Robust.Shared.IoC;
@@ -10,6 +11,7 @@ namespace Content.Server.GameObjects.Components.Disposal
 {
     [RegisterComponent]
     [ComponentReference(typeof(IDisposalTubeComponent))]
+    [IgnoreOnClient]
     public class DisposalEntryComponent : DisposalTubeComponent
     {
         [Dependency] private readonly IRobustRandom _random = default!;

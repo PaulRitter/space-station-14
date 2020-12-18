@@ -1,4 +1,5 @@
 ﻿using System;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Weapons.Ranged.Barrels;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Server.GameObjects;
@@ -23,6 +24,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Ammunition
     /// Generally used for bullets but can be used for other things like bananas
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class AmmoComponent : Component, IExamine
     {
         [Dependency] private readonly IGameTiming _gameTiming = default!;

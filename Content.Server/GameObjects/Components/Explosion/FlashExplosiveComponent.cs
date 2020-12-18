@@ -1,6 +1,7 @@
 ﻿using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.Components.Weapon;
 using Content.Server.GameObjects.EntitySystems;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.Containers;
@@ -14,6 +15,7 @@ namespace Content.Server.GameObjects.Components.Explosion
     /// When triggered will flash in an area around the object and destroy itself
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class FlashExplosiveComponent : Component, ITimerTrigger, IDestroyAct
     {
         public override string Name => "FlashExplosive";

@@ -1,4 +1,5 @@
 using Content.Server.GameObjects.Components.Explosion;
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.GameObjects.Components;
 using Robust.Shared.Interfaces.GameObjects;
@@ -6,6 +7,7 @@ using Robust.Shared.Interfaces.GameObjects;
 namespace Content.Server.GameObjects.Components.Projectiles
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class ExplosiveProjectileComponent : Component, ICollideBehavior
     {
         public override string Name => "ExplosiveProjectile";

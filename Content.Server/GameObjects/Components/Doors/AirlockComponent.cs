@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Interactable;
 using Content.Server.GameObjects.Components.Power.ApcNetComponents;
 using Content.Server.GameObjects.Components.VendingMachines;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Doors;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces;
@@ -27,6 +28,7 @@ namespace Content.Server.GameObjects.Components.Doors
     [RegisterComponent]
     [ComponentReference(typeof(IActivate))]
     [ComponentReference(typeof(ServerDoorComponent))]
+    [IgnoreOnClient]
     public class AirlockComponent : ServerDoorComponent, IWires
     {
         public override string Name => "Airlock";

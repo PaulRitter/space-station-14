@@ -6,6 +6,7 @@ using Content.Server.GameObjects.Components.Fluids;
 using Content.Server.GameObjects.EntitySystems;
 using Content.Shared.Audio;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body;
 using Content.Shared.GameObjects.Components.Body.Mechanism;
 using Content.Shared.GameObjects.Components.Nutrition;
@@ -31,6 +32,7 @@ namespace Content.Server.GameObjects.Components.Nutrition
 {
     [RegisterComponent]
     [ComponentReference(typeof(IAfterInteract))]
+    [IgnoreOnClient]
     public class DrinkComponent : Component, IUse, IAfterInteract, ISolutionChange, IExamine, ILand
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

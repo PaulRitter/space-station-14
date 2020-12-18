@@ -1,4 +1,5 @@
-﻿using Content.Shared.GameObjects.EntitySystems;
+﻿using Content.Shared.GameObjects;
+using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
 using Robust.Shared.GameObjects;
@@ -12,6 +13,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Rotatable
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class RotatableComponent : Component
     {
         public override string Name => "Rotatable";

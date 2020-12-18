@@ -9,6 +9,7 @@ using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.Components.Utensil;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Body;
 using Content.Shared.GameObjects.Components.Body.Behavior;
 using Content.Shared.GameObjects.Components.Body.Mechanism;
@@ -30,6 +31,7 @@ namespace Content.Server.GameObjects.Components.Nutrition
 {
     [RegisterComponent]
     [ComponentReference(typeof(IAfterInteract))]
+    [IgnoreOnClient]
     public class FoodComponent : Component, IUse, IAfterInteract
     {
         [Dependency] private readonly IEntitySystemManager _entitySystem = default!;

@@ -13,10 +13,12 @@ using Robust.Shared.Maths;
 using Robust.Shared.Serialization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Content.Shared.GameObjects;
 
 namespace Content.Server.GameObjects.Components.Items
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class FloorTileItemComponent : Component, IAfterInteract
     {
         [Dependency] private readonly ITileDefinitionManager _tileDefinitionManager = default!;

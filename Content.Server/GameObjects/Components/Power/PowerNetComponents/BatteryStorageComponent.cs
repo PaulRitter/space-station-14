@@ -1,4 +1,5 @@
-﻿using Robust.Shared.GameObjects;
+﻿using Content.Shared.GameObjects;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 using Robust.Shared.ViewVariables;
 
@@ -8,6 +9,7 @@ namespace Content.Server.GameObjects.Components.Power.PowerNetComponents
     ///     Takes power via a <see cref="PowerConsumerComponent"/> to charge a <see cref="BatteryComponent"/>.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class BatteryStorageComponent : Component
     {
         public override string Name => "BatteryStorage";

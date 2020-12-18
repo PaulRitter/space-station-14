@@ -6,6 +6,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components
 {
+    [IgnoreOnClient]
     public class SharedMagicMirrorComponent : Component
     {
         public override string Name => "MagicMirror";

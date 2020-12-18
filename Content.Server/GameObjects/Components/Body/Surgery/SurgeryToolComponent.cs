@@ -28,6 +28,7 @@ namespace Content.Server.GameObjects.Components.Body.Surgery
     ///     For instance, the scalpel.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class SurgeryToolComponent : Component, ISurgeon, IAfterInteract
     {
         public override string Name => "SurgeryTool";

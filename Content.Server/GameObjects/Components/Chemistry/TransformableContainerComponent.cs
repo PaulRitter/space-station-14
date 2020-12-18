@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using Content.Server.GameObjects.EntitySystems;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
@@ -10,6 +11,7 @@ using Robust.Shared.Utility;
 namespace Content.Server.GameObjects.Components.Chemistry
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class TransformableContainerComponent : Component, ISolutionChange
     {
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;

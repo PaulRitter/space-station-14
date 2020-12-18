@@ -1,5 +1,6 @@
 ﻿using System;
 using Content.Server.GameObjects.EntitySystems;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Trigger;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
@@ -11,6 +12,7 @@ using Robust.Shared.Serialization;
 namespace Content.Server.GameObjects.Components.Trigger.TimerTrigger
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class OnUseTimerTriggerComponent : Component, IUse
     {
         [Dependency] private readonly IEntitySystemManager _entitySystemManager = default!;

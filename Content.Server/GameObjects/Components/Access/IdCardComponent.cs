@@ -1,3 +1,4 @@
+using Content.Shared.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Localization;
 using Robust.Shared.Serialization;
@@ -6,6 +7,7 @@ using Robust.Shared.ViewVariables;
 namespace Content.Server.GameObjects.Components.Access
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class IdCardComponent : Component
     {
         public override string Name => "IdCard";

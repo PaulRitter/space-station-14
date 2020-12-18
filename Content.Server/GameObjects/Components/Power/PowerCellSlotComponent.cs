@@ -3,6 +3,7 @@ using System;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Shared.Audio;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.GameObjects.Verbs;
 using Robust.Server.GameObjects.Components.Container;
@@ -23,6 +24,7 @@ namespace Content.Server.GameObjects.Components.Power
     /// <see cref="PowerCellSize"/>. Intended to supplement other components, not very useful by itself.
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class PowerCellSlotComponent : Component, IExamine, IMapInit
     {
         public override string Name => "PowerCellSlot";

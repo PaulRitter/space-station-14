@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.Components.Weapon.Ranged.Barrels;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Weapons.Ranged.Barrels;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Interfaces;
@@ -20,6 +21,7 @@ using Robust.Shared.Utility;
 namespace Content.Server.GameObjects.Components.Weapon.Ranged.Ammunition
 {
     [RegisterComponent]
+    [IgnoreOnClient]
     public class RangedMagazineComponent : Component, IMapInit, IInteractUsing, IUse, IExamine
     {
         public override string Name => "RangedMagazine";

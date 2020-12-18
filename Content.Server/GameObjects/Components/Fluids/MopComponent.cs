@@ -10,6 +10,7 @@ using Robust.Shared.GameObjects.Systems;
 using Robust.Shared.Localization;
 using Robust.Shared.Serialization;
 using System.Threading.Tasks;
+using Content.Shared.GameObjects;
 
 namespace Content.Server.GameObjects.Components.Fluids
 {
@@ -17,6 +18,7 @@ namespace Content.Server.GameObjects.Components.Fluids
     /// For cleaning up puddles
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class MopComponent : Component, IAfterInteract
     {
         public override string Name => "Mop";

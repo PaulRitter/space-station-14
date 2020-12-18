@@ -1,4 +1,5 @@
 ﻿using Content.Server.GameObjects.Components.Access;
+using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Storage;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.GameObjects.Verbs;
@@ -21,6 +22,7 @@ namespace Content.Server.GameObjects.Components.Items.Storage
     [ComponentReference(typeof(EntityStorageComponent))]
     [ComponentReference(typeof(IActivate))]
     [ComponentReference(typeof(IStorageComponent))]
+    [IgnoreOnClient]
     public class SecureEntityStorageComponent : EntityStorageComponent
     {
         public override string Name => "SecureEntityStorage";

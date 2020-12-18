@@ -3,6 +3,7 @@ using System;
 using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Chemistry;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects.EntitySystems;
@@ -17,6 +18,7 @@ namespace Content.Server.GameObjects.Components.Fluids
     /// Can a mop click on this entity and dump its fluids
     /// </summary>
     [RegisterComponent]
+    [IgnoreOnClient]
     public class BucketComponent : Component, IInteractUsing
     {
         public override string Name => "Bucket";

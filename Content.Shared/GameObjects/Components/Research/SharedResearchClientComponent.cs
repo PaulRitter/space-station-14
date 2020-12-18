@@ -5,6 +5,7 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared.GameObjects.Components.Research
 {
+    [IgnoreOnClient]
     public class SharedResearchClientComponent : Component
     {
         public override string Name => "ResearchClient";
