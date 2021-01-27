@@ -77,7 +77,7 @@ namespace Content.Client.GameObjects.Components.Mobs
             {
                 _data = IDeepClone.CloneValue(_data),
                 _stateMap = IDeepClone.CloneValue(_stateMap),
-                _originalDrawDepth = IDeepClone.CloneValue(_originalDrawDepth)
+                _originalDrawDepth = _originalDrawDepth
             };
         }
     }

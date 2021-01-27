@@ -353,7 +353,7 @@ namespace Content.Server.Botany
 
         public IDeepClone DeepClone()
         {
-            return Clone();
+            return Clone(); // TODO ask paul
         }
     }
 }

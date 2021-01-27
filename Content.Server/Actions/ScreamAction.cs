@@ -85,10 +85,10 @@ namespace Content.Server.Actions
         {
             return new ScreamAction
             {
-                _male = _male,
+                _male = IDeepClone.CloneValue(_male),
                 _cooldown = _cooldown,
-                _female = _female,
-                _random = _random,
+                _female = IDeepClone.CloneValue(_female),
+                _random = IDeepClone.CloneValue(_random),
                 _wilhelm = _wilhelm
             };
         }

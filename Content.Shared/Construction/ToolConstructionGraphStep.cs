@@ -37,7 +37,7 @@ namespace Content.Shared.Construction
         {
             return new ToolConstructionGraphStep
             {
-                Tool = Tool,
+                Tool = IDeepClone.CloneValue(Tool),
                 Fuel = Fuel,
                 ExamineOverride = ExamineOverride
             };

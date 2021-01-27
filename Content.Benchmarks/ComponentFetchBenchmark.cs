@@ -215,7 +215,7 @@ namespace Content.Benchmarks
 
             public IDeepClone DeepClone()
             {
-                return new EntityUid(Value);
+                return new EntityUid(IDeepClone.CloneValue(Value));
             }
         }
 

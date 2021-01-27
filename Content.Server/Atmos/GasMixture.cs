@@ -612,7 +612,16 @@ namespace Content.Server.Atmos
 
         public IDeepClone DeepClone()
         {
-            return (GasMixture)Clone();
+            return new GasMixture(IDeepClone.CloneValue(_atmosphereSystem))
+            {
+                _moles = IDeepClone.CloneValue(_moles)!,
+                _molesArchived = IDeepClone.CloneValue(_molesArchived)!,
+                _temperature = _temperature,
+                Immutable = Immutable,
+                LastShare =  LastShare,
+                TemperatureArchived = TemperatureArchived,
+                Volume = Volume
+            };
         }
     }
 }

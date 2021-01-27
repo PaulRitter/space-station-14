@@ -20,7 +20,11 @@ namespace Content.Server.GameObjects.Components.Destructible.Thresholds
 
         public IDeepClone DeepClone()
         {
-            return this;
+            return new MinMax
+            {
+                Min = Min,
+                Max = Max
+            };
         }
     }
 }

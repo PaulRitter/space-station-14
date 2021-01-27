@@ -35,7 +35,7 @@ namespace Content.Shared.Construction
         {
             return new MaterialConstructionGraphStep
             {
-                Material = Material,
+                Material = IDeepClone.CloneValue(Material),
                 Amount = Amount
             };
         }

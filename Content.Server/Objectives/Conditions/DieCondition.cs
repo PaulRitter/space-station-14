@@ -56,7 +56,7 @@ namespace Content.Server.Objectives.Conditions
         {
             return new DieCondition
             {
-                _mind = _mind
+                _mind = IDeepClone.CloneValue(_mind)
             };
         }
     }

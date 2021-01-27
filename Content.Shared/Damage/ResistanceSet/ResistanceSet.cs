@@ -87,7 +87,11 @@ namespace Content.Shared.Damage.ResistanceSet
 
         public IDeepClone DeepClone()
         {
-            return this;
+            return new ResistanceSetSettings
+            {
+                Coefficient = Coefficient,
+                FlatReduction =  FlatReduction
+            };
         }
     }
 }

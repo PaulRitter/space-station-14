@@ -259,10 +259,10 @@ namespace Content.Client.GameObjects.Components
         {
             return new RandomizeBehaviour
             {
-                _randomValue1 = _randomValue1,
-                _randomValue2 = _randomValue2,
-                _randomValue3 = _randomValue3,
-                _randomValue4 = _randomValue4
+                _randomValue1 = IDeepClone.CloneValue(_randomValue1),
+                _randomValue2 = IDeepClone.CloneValue(_randomValue2),
+                _randomValue3 = IDeepClone.CloneValue(_randomValue3),
+                _randomValue4 = IDeepClone.CloneValue(_randomValue4)
             };
         }
 
@@ -319,7 +319,7 @@ namespace Content.Client.GameObjects.Components
         {
             return new ColorCycleBehaviour
             {
-                _colorIndex = IDeepClone.CloneValue(_colorIndex),
+                _colorIndex = _colorIndex,
                 ColorsToCycle = IDeepClone.CloneValue(ColorsToCycle)
             };
         }

@@ -30,7 +30,7 @@ namespace Content.Server.Objectives.Conditions
         {
             return new KillRandomPersonCondition
             {
-                Target = Target
+                Target = IDeepClone.CloneValue(Target)
             };
         }
     }
