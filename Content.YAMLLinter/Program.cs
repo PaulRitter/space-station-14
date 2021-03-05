@@ -30,13 +30,15 @@ namespace Content.YAMLLinter
                 return 0;
             }
 
+            Console.WriteLine($"::group::Found {errors.Count} Error(s)");
             foreach (var (file, errorHashset) in errors)
             {
                 foreach (var errorNode in errorHashset)
                 {
-                    Console.WriteLine($"Error: {file}({errorNode.Node.Start.Line},{errorNode.Node.Start.Column}): {errorNode.ErrorReason}");
+                    Console.WriteLine($"::error file={file},line={errorNode.Node.Start.Line},col={errorNode.Node.Start.Column}::{errorNode.ErrorReason}");
                 }
             }
+            Console.WriteLine("::endgroup::");
 
             Console.WriteLine($"{errors.Count} errors found in {(int) stopwatch.Elapsed.TotalMilliseconds} ms.");
             return -1;
