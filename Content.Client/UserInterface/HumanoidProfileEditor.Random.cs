@@ -1,8 +1,7 @@
-﻿using System.Linq;
-using Content.Shared.Preferences;
-using Content.Shared.Preferences.Appearance;
-using Content.Shared.Text;
-using Robust.Shared.Interfaces.Random;
+﻿using Content.Shared.Preferences;
+using Content.Shared.Prototypes;
+using Content.Shared.Utility;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Client.UserInterface
@@ -10,58 +9,25 @@ namespace Content.Client.UserInterface
     public partial class HumanoidProfileEditor
     {
         private readonly IRobustRandom _random;
+        private readonly IPrototypeManager _prototypeManager;
 
         private void RandomizeEverything()
         {
-            RandomizeSex();
-            RandomizeAge();
-            RandomizeName();
-            RandomizeAppearance();
-        }
-
-        private void RandomizeSex()
-        {
-            SetSex(_random.Prob(0.5f) ? Sex.Male : Sex.Female);
+            Profile = HumanoidCharacterProfile.Random();
             UpdateSexControls();
-        }
-
-        private void RandomizeAge()
-        {
-            SetAge(_random.Next(HumanoidCharacterProfile.MinimumAge, HumanoidCharacterProfile.MaximumAge));
+            UpdateGenderControls();
+            UpdateClothingControls();
             UpdateAgeEdit();
+            UpdateNameEdit();
+            UpdateHairPickers();
         }
 
         private void RandomizeName()
         {
-            var firstName = _random.Pick(Profile.Sex == Sex.Male
-                ? Names.MaleFirstNames
-                : Names.FemaleFirstNames);
-            var lastName = _random.Pick(Names.LastNames);
+            var firstName = _random.Pick(Profile.Sex.FirstNames(_prototypeManager).Values);
+            var lastName = _random.Pick(_prototypeManager.Index<DatasetPrototype>("names_last"));
             SetName($"{firstName} {lastName}");
             UpdateNameEdit();
-        }
-
-        private void RandomizeAppearance()
-        {
-            var newHairStyle = _random.Pick(HairStyles.HairStylesMap.Keys.ToList());
-
-            var newFacialHairStyle = Profile.Sex == Sex.Female
-                ? HairStyles.DefaultFacialHairStyle
-                : _random.Pick(HairStyles.FacialHairStylesMap.Keys.ToList());
-
-            var newHairColor = _random.Pick(HairStyles.RealisticHairColors);
-            newHairColor = newHairColor
-                .WithRed(newHairColor.R + _random.Next(-25, 25) / 100f)
-                .WithGreen(newHairColor.G + _random.Next(-25, 25) / 100f)
-                .WithBlue(newHairColor.B + _random.Next(-25, 25) / 100f);
-
-            Profile = Profile.WithCharacterAppearance(
-                Profile.Appearance
-                    .WithHairStyleName(newHairStyle)
-                    .WithFacialHairStyleName(newFacialHairStyle)
-                    .WithHairColor(newHairColor)
-                    .WithFacialHairColor(newHairColor));
-            UpdateHairPickers();
         }
     }
 }

@@ -1,5 +1,4 @@
-using Content.Client.GameObjects.Components.Strap;
-using Content.Client.Interfaces.GameObjects.Components.Interaction;
+﻿#nullable enable
 using Content.Shared.GameObjects.Components.Buckle;
 using Robust.Client.GameObjects;
 using Robust.Shared.GameObjects;
@@ -7,23 +6,32 @@ using Robust.Shared.GameObjects;
 namespace Content.Client.GameObjects.Components.Buckle
 {
     [RegisterComponent]
-    public class BuckleComponent : SharedBuckleComponent, IClientDraggable
+    [ComponentReference(typeof(SharedBuckleComponent))]
+    public class BuckleComponent : SharedBuckleComponent
     {
         private bool _buckled;
         private int? _originalDrawDepth;
 
         public override bool Buckled => _buckled;
 
-        public override void HandleComponentState(ComponentState curState, ComponentState nextState)
+        public override bool TryBuckle(IEntity? user, IEntity to)
         {
-            if (!(curState is BuckleComponentState buckle))
+            // TODO: Prediction
+            return false;
+        }
+
+        public override void HandleComponentState(ComponentState? curState, ComponentState? nextState)
+        {
+            if (curState is not BuckleComponentState buckle)
             {
                 return;
             }
 
             _buckled = buckle.Buckled;
+            LastEntityBuckledTo = buckle.LastEntityBuckledTo;
+            DontCollide = buckle.DontCollide;
 
-            if (!Owner.TryGetComponent(out SpriteComponent ownerSprite))
+            if (!Owner.TryGetComponent(out SpriteComponent? ownerSprite))
             {
                 return;
             }
@@ -40,16 +48,6 @@ namespace Content.Client.GameObjects.Components.Buckle
                 ownerSprite.DrawDepth = _originalDrawDepth.Value;
                 _originalDrawDepth = null;
             }
-        }
-
-        bool IClientDraggable.ClientCanDropOn(CanDropEventArgs eventArgs)
-        {
-            return eventArgs.Target.HasComponent<StrapComponent>();
-        }
-
-        bool IClientDraggable.ClientCanDrag(CanDragEventArgs eventArgs)
-        {
-            return true;
         }
     }
 }

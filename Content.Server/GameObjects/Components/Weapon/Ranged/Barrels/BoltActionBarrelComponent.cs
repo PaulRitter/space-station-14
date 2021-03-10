@@ -4,21 +4,18 @@ using Content.Server.GameObjects.Components.Weapon.Ranged.Ammunition;
 using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Weapons.Ranged.Barrels;
 using Content.Shared.GameObjects.EntitySystems;
+using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
-using Robust.Server.GameObjects.Components.Container;
-using Robust.Server.GameObjects.EntitySystems;
-using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Localization;
 using Robust.Shared.Map;
-using Robust.Shared.Serialization;
+using Robust.Shared.Players;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Utility;
 using Robust.Shared.ViewVariables;
 
@@ -45,16 +42,19 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
             }
         }
         public override int Capacity => _capacity;
-        private int _capacity;
+        [DataField("capacity")]
+        private int _capacity = 6;
 
         private ContainerSlot _chamberContainer;
         private Stack<IEntity> _spawnedAmmo;
         private Container _ammoContainer;
 
         [ViewVariables]
-        private BallisticCaliber _caliber;
+        [DataField("caliber")]
+        private BallisticCaliber _caliber = BallisticCaliber.Unspecified;
 
         [ViewVariables]
+        [DataField("fillPrototype")]
         private string _fillPrototype;
         [ViewVariables]
         private int _unspawnedCount;
@@ -94,28 +94,19 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
             }
         }
         private bool _boltOpen;
+        [DataField("autoCycle")]
         private bool _autoCycle;
 
         private AppearanceComponent _appearanceComponent;
         // Sounds
-        private string _soundCycle;
-        private string _soundBoltOpen;
-        private string _soundBoltClosed;
-        private string _soundInsert;
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _caliber, "caliber", BallisticCaliber.Unspecified);
-            serializer.DataField(ref _capacity, "capacity", 6);
-            serializer.DataField(ref _fillPrototype, "fillPrototype", null);
-            serializer.DataField(ref _autoCycle, "autoCycle", false);
-
-            serializer.DataField(ref _soundCycle, "soundCycle", "/Audio/Weapons/Guns/Cock/sf_rifle_cock.ogg");
-            serializer.DataField(ref _soundBoltOpen, "soundBoltOpen", "/Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg");
-            serializer.DataField(ref _soundBoltClosed, "soundBoltClosed", "/Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg");
-            serializer.DataField(ref _soundInsert, "soundInsert", "/Audio/Weapons/Guns/MagIn/bullet_insert.ogg");
-        }
+        [DataField("soundCycle")]
+        private string _soundCycle = "/Audio/Weapons/Guns/Cock/sf_rifle_cock.ogg";
+        [DataField("soundBoltOpen")]
+        private string _soundBoltOpen = "/Audio/Weapons/Guns/Bolt/rifle_bolt_open.ogg";
+        [DataField("soundBoltClosed")]
+        private string _soundBoltClosed = "/Audio/Weapons/Guns/Bolt/rifle_bolt_closed.ogg";
+        [DataField("soundInsert")]
+        private string _soundInsert = "/Audio/Weapons/Guns/MagIn/bullet_insert.ogg";
 
         void IMapInit.MapInit()
         {
@@ -132,7 +123,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
             UpdateAppearance();
         }
 
-        public override ComponentState GetComponentState()
+        public override ComponentState GetComponentState(ICommonSession player)
         {
             (int, int)? count = (ShotsLeft, Capacity);
             var chamberedExists = _chamberContainer.ContainedEntity != null;
@@ -155,7 +146,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
             // TODO: Add existing ammo support on revolvers
             base.Initialize();
             _spawnedAmmo = new Stack<IEntity>(_capacity - 1);
-            _ammoContainer = ContainerManagerComponent.Ensure<Container>($"{Name}-ammo-container", Owner, out var existing);
+            _ammoContainer = ContainerHelpers.EnsureContainer<Container>(Owner, $"{Name}-ammo-container", out var existing);
 
             if (existing)
             {
@@ -166,7 +157,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
                 }
             }
 
-            _chamberContainer = ContainerManagerComponent.Ensure<ContainerSlot>($"{Name}-chamber-container", Owner);
+            _chamberContainer = ContainerHelpers.EnsureContainer<ContainerSlot>(Owner, $"{Name}-chamber-container");
 
             if (Owner.TryGetComponent(out AppearanceComponent appearanceComponent))
             {
@@ -190,7 +181,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
             return _chamberContainer.ContainedEntity;
         }
 
-        public override IEntity TakeProjectile(EntityCoordinates spawnAtGrid, MapCoordinates spawnAtMap)
+        public override IEntity TakeProjectile(EntityCoordinates spawnAt)
         {
             var chamberEntity = _chamberContainer.ContainedEntity;
             if (_autoCycle)
@@ -202,7 +193,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
                 Dirty();
             }
 
-            return chamberEntity?.GetComponent<AmmoComponent>().TakeBullet(spawnAtGrid, spawnAtMap);
+            return chamberEntity?.GetComponent<AmmoComponent>().TakeBullet(spawnAt);
         }
 
         protected override bool WeaponCanFire()
@@ -223,7 +214,7 @@ namespace Content.Server.GameObjects.Components.Weapon.Ranged.Barrels
             if (_chamberContainer.ContainedEntity == null && manual)
             {
                 BoltOpen = true;
-                if (ContainerHelpers.TryGetContainer(Owner, out var container))
+                if (Owner.TryGetContainer(out var container))
                 {
                     Owner.PopupMessage(container.Owner, Loc.GetString("Bolt opened"));
                 }

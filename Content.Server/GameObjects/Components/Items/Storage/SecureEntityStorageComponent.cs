@@ -1,17 +1,17 @@
 ﻿using Content.Server.GameObjects.Components.Access;
 using Content.Shared.GameObjects.Components.Storage;
-using Content.Shared.GameObjects.EntitySystems;
+using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
-using Robust.Server.GameObjects.EntitySystems;
 using Robust.Shared.Audio;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Localization;
+using Robust.Shared.Log;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Items.Storage
@@ -23,7 +23,8 @@ namespace Content.Server.GameObjects.Components.Items.Storage
     public class SecureEntityStorageComponent : EntityStorageComponent
     {
         public override string Name => "SecureEntityStorage";
-        private bool _locked;
+        [DataField("locked")]
+        private bool _locked = true;
 
         [ViewVariables(VVAccess.ReadWrite)]
         public bool Locked
@@ -38,13 +39,6 @@ namespace Content.Server.GameObjects.Components.Items.Storage
                     appearance.SetData(StorageVisuals.Locked, _locked);
                 }
             }
-        }
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataField(ref _locked, "locked", true);
         }
 
         protected override void Startup()
@@ -68,15 +62,14 @@ namespace Content.Server.GameObjects.Components.Items.Storage
             base.Activate(eventArgs);
         }
 
-        protected override void TryOpenStorage(IEntity user)
+        public override bool CanOpen(IEntity user, bool silent = false)
         {
             if (Locked)
             {
                 Owner.PopupMessage(user, "It's locked!");
-                return;
+                return false;
             }
-
-            base.TryOpenStorage(user);
+            return base.CanOpen(user, silent);
         }
 
         protected override void OpenVerbGetData(IEntity user, EntityStorageComponent component, VerbData data)
@@ -104,7 +97,7 @@ namespace Content.Server.GameObjects.Components.Items.Storage
 
         private void DoUnlock(IEntity user)
         {
-            if (CheckAccess(user)) return;
+            if (!CheckAccess(user)) return;
 
             Locked = false;
             EntitySystem.Get<AudioSystem>().PlayFromEntity("/Audio/Machines/door_lock_off.ogg", Owner, AudioParams.Default.WithVolume(-5));
@@ -112,7 +105,7 @@ namespace Content.Server.GameObjects.Components.Items.Storage
 
         private void DoLock(IEntity user)
         {
-            if (CheckAccess(user)) return;
+            if (!CheckAccess(user)) return;
 
             Locked = true;
             EntitySystem.Get<AudioSystem>().PlayFromEntity("/Audio/Machines/door_lock_on.ogg", Owner, AudioParams.Default.WithVolume(-5));
@@ -125,11 +118,11 @@ namespace Content.Server.GameObjects.Components.Items.Storage
                 if (!reader.IsAllowed(user))
                 {
                     Owner.PopupMessage(user, Loc.GetString("Access denied"));
-                    return true;
+                    return false;
                 }
             }
 
-            return false;
+            return true;
         }
 
         [Verb]

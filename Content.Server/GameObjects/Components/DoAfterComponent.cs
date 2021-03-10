@@ -1,12 +1,10 @@
-#nullable enable
+﻿#nullable enable
 using System.Collections.Generic;
 using Content.Server.GameObjects.EntitySystems.DoAfter;
 using Content.Shared.GameObjects.Components;
-using Robust.Server.GameObjects;
-using Robust.Server.Interfaces.GameObjects;
+using Content.Shared.GameObjects.Components.Damage;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Network;
+using Robust.Shared.Players;
 
 namespace Content.Server.GameObjects.Components
 {
@@ -14,102 +12,79 @@ namespace Content.Server.GameObjects.Components
     public sealed class DoAfterComponent : SharedDoAfterComponent
     {
         public IReadOnlyCollection<DoAfter> DoAfters => _doAfters.Keys;
-        private readonly Dictionary<DoAfter, byte> _doAfters = new Dictionary<DoAfter, byte>();
+        private readonly Dictionary<DoAfter, byte> _doAfters = new();
 
         // So the client knows which one to update (and so we don't send all of the do_afters every time 1 updates)
         // we'll just send them the index. Doesn't matter if it wraps around.
         private byte _runningIndex;
 
-        public override void HandleMessage(ComponentMessage message, IComponent? component)
+        public override ComponentState GetComponentState(ICommonSession player)
         {
-            base.HandleMessage(message, component);
-            switch (message)
-            {
-                case PlayerAttachedMsg _:
-                    UpdateClient();
-                    break;
-            }
-        }
+            var toAdd = new List<ClientDoAfter>();
 
-        // Only sending data to the relevant client (at least, other clients don't need to know about do_after for now).
-        private void UpdateClient()
-        {
-            if (!TryGetConnectedClient(out var connectedClient))
-            {
-                return;
-            }
-
-            foreach (var (doAfter, id) in _doAfters)
+            foreach (var doAfter in DoAfters)
             {
                 // THE ALMIGHTY PYRAMID
-                var message = new DoAfterMessage(
-                    id,
+                var clientDoAfter = new ClientDoAfter(
+                    _doAfters[doAfter],
                     doAfter.UserGrid,
                     doAfter.TargetGrid,
                     doAfter.StartTime,
                     doAfter.EventArgs.Delay,
                     doAfter.EventArgs.BreakOnUserMove,
                     doAfter.EventArgs.BreakOnTargetMove,
+                    doAfter.EventArgs.MovementThreshold,
                     doAfter.EventArgs.Target?.Uid ?? EntityUid.Invalid);
 
-                SendNetworkMessage(message, connectedClient);
+                toAdd.Add(clientDoAfter);
             }
+
+            return new DoAfterComponentState(toAdd);
         }
 
-        private bool TryGetConnectedClient(out INetChannel? connectedClient)
+        public override void HandleMessage(ComponentMessage message, IComponent? component)
         {
-            connectedClient = null;
+            base.HandleMessage(message, component);
 
-            if (!Owner.TryGetComponent(out IActorComponent? actorComponent))
+            switch (message)
             {
-                return false;
-            }
+                case DamageChangedMessage msg:
+                    if (DoAfters.Count == 0)
+                    {
+                        return;
+                    }
 
-            connectedClient = actorComponent.playerSession.ConnectedClient;
-            if (!connectedClient.IsConnected)
-            {
-                return false;
-            }
+                    if (!msg.TookDamage)
+                    {
+                        return;
+                    }
 
-            return true;
+                    foreach (var doAfter in _doAfters.Keys)
+                    {
+                        if (doAfter.EventArgs.BreakOnDamage)
+                        {
+                            doAfter.TookDamage = true;
+                        }
+                    }
+
+                    break;
+            }
         }
 
         public void Add(DoAfter doAfter)
         {
             _doAfters.Add(doAfter, _runningIndex);
-
-            if (TryGetConnectedClient(out var connectedClient))
-            {
-                var message = new DoAfterMessage(
-                    _runningIndex,
-                    doAfter.UserGrid,
-                    doAfter.TargetGrid,
-                    doAfter.StartTime,
-                    doAfter.EventArgs.Delay,
-                    doAfter.EventArgs.BreakOnUserMove,
-                    doAfter.EventArgs.BreakOnTargetMove,
-                    doAfter.EventArgs.Target?.Uid ?? EntityUid.Invalid);
-
-                SendNetworkMessage(message, connectedClient);
-            }
-
             _runningIndex++;
+            Dirty();
         }
 
         public void Cancelled(DoAfter doAfter)
         {
             if (!_doAfters.TryGetValue(doAfter, out var index))
-            {
                 return;
-            }
-
-            if (TryGetConnectedClient(out var connectedClient))
-            {
-                var message = new CancelledDoAfterMessage(index);
-                SendNetworkMessage(message, connectedClient);
-            }
 
             _doAfters.Remove(doAfter);
+            SendNetworkMessage(new CancelledDoAfterMessage(index));
         }
 
         /// <summary>
@@ -120,9 +95,7 @@ namespace Content.Server.GameObjects.Components
         public void Finished(DoAfter doAfter)
         {
             if (!_doAfters.ContainsKey(doAfter))
-            {
                 return;
-            }
 
             _doAfters.Remove(doAfter);
         }

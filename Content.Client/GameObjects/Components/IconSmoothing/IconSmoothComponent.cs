@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using Content.Client.GameObjects.EntitySystems;
 using JetBrains.Annotations;
-using Robust.Client.Interfaces.GameObjects.Components;
+using Robust.Client.GameObjects;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components.Transform;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using static Robust.Client.GameObjects.SpriteComponent;
 
 namespace Content.Client.GameObjects.Components.IconSmoothing
@@ -27,15 +27,18 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
     [RegisterComponent]
     public class IconSmoothComponent : Component
     {
-        private string _smoothKey;
-        private string _stateBase;
-        private IconSmoothingMode _mode;
+        [DataField("key")]
+        private string _smoothKey = default;
+        [DataField("base")]
+        private string _stateBase = "";
+        [DataField("mode")]
+        private IconSmoothingMode _mode = IconSmoothingMode.Corners;
 
         public override string Name => "IconSmooth";
 
         internal ISpriteComponent Sprite { get; private set; }
         internal SnapGridComponent SnapGrid { get; private set; }
-        private (GridId, MapIndices) _lastPosition;
+        private (GridId, Vector2i) _lastPosition;
 
         /// <summary>
         ///     We will smooth with other objects with the same key.
@@ -63,15 +66,6 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
 
             SnapGrid = Owner.GetComponent<SnapGridComponent>();
             Sprite = Owner.GetComponent<ISpriteComponent>();
-        }
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataFieldCached(ref _stateBase, "base", "");
-            serializer.DataFieldCached(ref _smoothKey, "key", null);
-            serializer.DataFieldCached(ref _mode, "mode", IconSmoothingMode.Corners);
         }
 
         /// <inheritdoc />
@@ -105,11 +99,11 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
                 case IconSmoothingMode.Corners:
                     CalculateNewSpriteCorners();
                     break;
-
                 case IconSmoothingMode.CardinalFlags:
                     CalculateNewSpriteCardinal();
                     break;
-
+                case IconSmoothingMode.NoSprite:
+                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -203,7 +197,17 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
                 cornerNW |= CornerFill.Diagonal;
             }
 
-            return (cornerNE, cornerNW, cornerSW, cornerSE);
+            switch (Owner.Transform.WorldRotation.GetCardinalDir())
+            {
+                case Direction.North:
+                    return (cornerSW, cornerSE, cornerNE, cornerNW);
+                case Direction.West:
+                    return (cornerSE, cornerNE, cornerNW, cornerSW);
+                case Direction.South:
+                    return (cornerNE, cornerNW, cornerSW, cornerSE);
+                default:
+                    return (cornerNW, cornerSW, cornerSE, cornerNE);
+            }
         }
 
         /// <inheritdoc />
@@ -267,7 +271,7 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
             Clockwise = 4,
         }
 
-        public enum CornerLayers
+        public enum CornerLayers : byte
         {
             SE,
             NE,
@@ -280,7 +284,7 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
     ///     Controls the mode with which icon smoothing is calculated.
     /// </summary>
     [PublicAPI]
-    public enum IconSmoothingMode
+    public enum IconSmoothingMode : byte
     {
         /// <summary>
         ///     Each icon is made up of 4 corners, each of which can get a different state depending on
@@ -293,5 +297,10 @@ namespace Content.Client.GameObjects.Components.IconSmoothing
         ///     The icon selected is a bit field made up of the cardinal direction flags that have adjacent entities.
         /// </summary>
         CardinalFlags,
+
+        /// <summary>
+        ///     Where this component contributes to our neighbors being calculated but we do not update our own sprite.
+        /// </summary>
+        NoSprite,
     }
 }

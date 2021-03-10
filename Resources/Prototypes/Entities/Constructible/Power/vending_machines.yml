@@ -1,16 +1,18 @@
-﻿- type: entity
+﻿# Vending machine descriptions are stored in vendingMachineInventory YAML files.
+- type: entity
   id: VendingMachine
   name: vending machine
   abstract: true
+  placement:
+    mode: SnapgridCenter
   components:
-  - type: Physics
-    anchored: true
   - type: Clickable
   - type: InteractionOutline
   - type: Sprite
     sprite: Constructible/Power/VendingMachines/empty.rsi
     netsync: false
-  - type: Collidable
+  - type: Physics
+    anchored: true
     shapes:
     - !type:PhysShapeAabb
       bounds: "-0.5,-0.25,0.5,0.25"
@@ -27,9 +29,16 @@
       - SmallImpassable
   - type: SnapGrid
     offset: Center
-  - type: Breakable
-    deadThreshold: 50
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 50
+      behaviors:
+      - !type:DoActsBehavior
+        acts: ["Breakage"]
   - type: UserInterface
     interfaces:
     - key: enum.VendingMachineUiKey.Key
@@ -66,6 +75,8 @@
       normalUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Service"]]
 
 - type: entity
   parent: VendingMachine
@@ -224,6 +235,8 @@
       ejectUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Service"]]
 
 - type: entity
   parent: VendingMachine
@@ -274,6 +287,8 @@
       denyUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Engineering"]]
 
 - type: entity
   parent: VendingMachine
@@ -348,6 +363,8 @@
       denyUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Medical"]]
 
 - type: entity
   parent: VendingMachine
@@ -399,6 +416,8 @@
       denyUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Service"]]
 
 - type: entity
   parent: VendingMachine
@@ -424,6 +443,8 @@
       denyUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Research"]]
 
 - type: entity
   parent: VendingMachine
@@ -475,6 +496,8 @@
       denyUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Security"]]
 
 - type: entity
   parent: VendingMachine
@@ -501,6 +524,8 @@
       ejectUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Service"]]
 
 - type: entity
   parent: VendingMachine
@@ -740,6 +765,8 @@
       denyUnshaded: true
       broken: true
     - type: WiresVisualizer
+  - type: AccessReader
+    access: [["Medical"]]
 
 - type: entity
   parent: VendingMachine

@@ -1,39 +1,41 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
+using System.Linq;
 using Content.Server.GameObjects.Components.Buckle;
+using Content.Shared.Alert;
 using Content.Shared.GameObjects.Components.Strap;
-using Content.Shared.GameObjects.EntitySystems;
+using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Content.Shared.Utility;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Localization;
+using Robust.Shared.Players;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Strap
 {
     [RegisterComponent]
-    public class StrapComponent : SharedStrapComponent, IInteractHand
+    [ComponentReference(typeof(SharedStrapComponent))]
+    public class StrapComponent : SharedStrapComponent, IInteractHand, ISerializationHooks
     {
-        private HashSet<IEntity> _buckledEntities;
-        private StrapPosition _position;
-        private string _buckleSound;
-        private string _unbuckleSound;
-        private string _buckledIcon;
+        [ComponentDependency] public readonly SpriteComponent? SpriteComponent = null;
+
+        private readonly HashSet<IEntity> _buckledEntities = new();
 
         /// <summary>
         /// The angle in degrees to rotate the player by when they get strapped
         /// </summary>
-        [ViewVariables]
+        [ViewVariables] [DataField("rotation")]
         private int _rotation;
 
         /// <summary>
         /// The size of the strap which is compared against when buckling entities
         /// </summary>
-        [ViewVariables]
-        private int _size;
+        [ViewVariables] [DataField("size")] private int _size = 100;
         private int _occupiedSize;
 
         /// <summary>
@@ -44,25 +46,29 @@ namespace Content.Server.GameObjects.Components.Strap
         /// <summary>
         /// The change in position to the strapped mob
         /// </summary>
-        public StrapPosition Position => _position;
+        [field: DataField("position")]
+        public StrapPosition Position { get; } = StrapPosition.None;
 
         /// <summary>
         /// The sound to be played when a mob is buckled
         /// </summary>
         [ViewVariables]
-        public string BuckleSound => _buckleSound;
+        [field: DataField("buckleSound")]
+        public string BuckleSound { get; } = "/Audio/Effects/buckle.ogg";
 
         /// <summary>
         /// The sound to be played when a mob is unbuckled
         /// </summary>
         [ViewVariables]
-        public string UnbuckleSound => _unbuckleSound;
+        [field: DataField("unbuckleSound")]
+        public string UnbuckleSound { get; } = "/Audio/Effects/unbuckle.ogg";
 
         /// <summary>
-        /// The icon to be displayed as a status when buckled
+        /// ID of the alert to show when buckled
         /// </summary>
         [ViewVariables]
-        public string BuckledIcon => _buckledIcon;
+        [field: DataField("buckledAlertType")]
+        public AlertType BuckledAlertType { get; } = AlertType.Buckled;
 
         /// <summary>
         /// The sum of the sizes of all the buckled entities in this strap
@@ -103,10 +109,7 @@ namespace Content.Server.GameObjects.Components.Strap
 
             _occupiedSize += buckle.Size;
 
-            if (buckle.Owner.TryGetComponent(out AppearanceComponent appearance))
-            {
-                appearance.SetData(StrapVisuals.RotationAngle, _rotation);
-            }
+            buckle.Appearance?.SetData(StrapVisuals.RotationAngle, _rotation);
 
             SendMessage(new StrapMessage(buckle.Owner, Owner));
 
@@ -127,31 +130,13 @@ namespace Content.Server.GameObjects.Components.Strap
             }
         }
 
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataField(ref _position, "position", StrapPosition.None);
-            serializer.DataField(ref _buckleSound, "buckleSound", "/Audio/Effects/buckle.ogg");
-            serializer.DataField(ref _unbuckleSound, "unbuckleSound", "/Audio/Effects/unbuckle.ogg");
-            serializer.DataField(ref _buckledIcon, "buckledIcon", "/Textures/Interface/StatusEffects/Buckle/buckled.png");
-            serializer.DataField(ref _rotation, "rotation", 0);
-
-            var defaultSize = 100;
-
-            serializer.DataField(ref _size, "size", defaultSize);
-            _buckledEntities = new HashSet<IEntity>(_size / defaultSize);
-
-            _occupiedSize = 0;
-        }
-
         public override void OnRemove()
         {
             base.OnRemove();
 
-            foreach (var entity in _buckledEntities)
+            foreach (var entity in _buckledEntities.ToArray())
             {
-                if (entity.TryGetComponent(out BuckleComponent buckle))
+                if (entity.TryGetComponent<BuckleComponent>(out var buckle))
                 {
                     buckle.TryUnbuckle(entity, true);
                 }
@@ -161,14 +146,14 @@ namespace Content.Server.GameObjects.Components.Strap
             _occupiedSize = 0;
         }
 
-        public override ComponentState GetComponentState()
+        public override ComponentState GetComponentState(ICommonSession player)
         {
             return new StrapComponentState(Position);
         }
 
         bool IInteractHand.InteractHand(InteractHandEventArgs eventArgs)
         {
-            if (!eventArgs.User.TryGetComponent(out BuckleComponent buckle))
+            if (!eventArgs.User.TryGetComponent<BuckleComponent>(out var buckle))
             {
                 return false;
             }
@@ -184,7 +169,7 @@ namespace Content.Server.GameObjects.Components.Strap
                 data.Visibility = VerbVisibility.Invisible;
 
                 if (!ActionBlockerSystem.CanInteract(component.Owner) ||
-                    !user.TryGetComponent(out BuckleComponent buckle) ||
+                    !user.TryGetComponent<BuckleComponent>(out var buckle) ||
                     buckle.BuckledTo != null && buckle.BuckledTo != component ||
                     user == component.Owner)
                 {
@@ -202,26 +187,31 @@ namespace Content.Server.GameObjects.Components.Strap
                     parent = parent.Parent;
                 }
 
-                var range = SharedInteractionSystem.InteractionRange / 2;
-
-                if (!user.InRangeUnobstructed(component, range))
+                if (!user.InRangeUnobstructed(component, buckle.Range))
                 {
                     return;
                 }
 
                 data.Visibility = VerbVisibility.Visible;
+                data.IconTexture = buckle.BuckledTo == null ? "/Textures/Interface/VerbIcons/buckle.svg.96dpi.png" : "/Textures/Interface/VerbIcons/unbuckle.svg.96dpi.png";
                 data.Text = Loc.GetString(buckle.BuckledTo == null ? "Buckle" : "Unbuckle");
             }
 
             protected override void Activate(IEntity user, StrapComponent component)
             {
-                if (!user.TryGetComponent(out BuckleComponent buckle))
+                if (!user.TryGetComponent<BuckleComponent>(out var buckle))
                 {
                     return;
                 }
 
                 buckle.ToggleBuckle(user, component.Owner);
             }
+        }
+
+        public override bool DragDropOn(DragDropEventArgs eventArgs)
+        {
+            if (!eventArgs.Dragged.TryGetComponent(out BuckleComponent? buckleComponent)) return false;
+            return buckleComponent.TryBuckle(eventArgs.User, Owner);
         }
     }
 }

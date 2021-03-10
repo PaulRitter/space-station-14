@@ -1,21 +1,24 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
+using Content.Server.Atmos;
 using Content.Server.GameObjects.Components.Items.Storage;
+using Content.Server.Interfaces;
+using Content.Shared.Atmos;
 using Content.Shared.GameObjects.Components.Body;
-using Robust.Server.GameObjects.Components.Container;
 using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Disposal
 {
     // TODO: Add gas
     [RegisterComponent]
-    public class DisposalHolderComponent : Component
+    public class DisposalHolderComponent : Component, IGasMixtureHolder
     {
         public override string Name => "DisposalHolder";
 
@@ -47,7 +50,24 @@ namespace Content.Server.GameObjects.Components.Disposal
         ///     A list of tags attached to the content, used for sorting
         /// </summary>
         [ViewVariables]
-        public HashSet<string> Tags { get; set; } = new HashSet<string>();
+        public HashSet<string> Tags { get; set; } = new();
+
+        [ViewVariables]
+        [DataField("air")]
+        public GasMixture Air { get; set; } = new GasMixture(Atmospherics.CellVolume);
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            _contents = ContainerHelpers.EnsureContainer<Container>(Owner, nameof(DisposalHolderComponent));
+        }
+
+        public override void OnRemove()
+        {
+            base.OnRemove();
+            ExitDisposals();
+        }
 
         private bool CanInsert(IEntity entity)
         {
@@ -56,14 +76,14 @@ namespace Content.Server.GameObjects.Components.Disposal
                 return false;
             }
 
-            if (!entity.TryGetComponent(out ICollidableComponent? collidable) ||
-                !collidable.CanCollide)
+            if (!entity.TryGetComponent(out IPhysicsComponent? physics) ||
+                !physics.CanCollide)
             {
                 return false;
             }
 
             return entity.HasComponent<ItemComponent>() ||
-                   entity.HasComponent<ISharedBodyManagerComponent>();
+                   entity.HasComponent<IBody>();
         }
 
         public bool TryInsert(IEntity entity)
@@ -73,9 +93,9 @@ namespace Content.Server.GameObjects.Components.Disposal
                 return false;
             }
 
-            if (entity.TryGetComponent(out ICollidableComponent? collidable))
+            if (entity.TryGetComponent(out IPhysicsComponent? physics))
             {
-                collidable.CanCollide = false;
+                physics.CanCollide = false;
             }
 
             return true;
@@ -105,17 +125,24 @@ namespace Content.Server.GameObjects.Components.Disposal
 
             foreach (var entity in _contents.ContainedEntities.ToArray())
             {
-                if (entity.TryGetComponent(out ICollidableComponent? collidable))
+                if (entity.TryGetComponent(out IPhysicsComponent? physics))
                 {
-                    collidable.CanCollide = true;
+                    physics.CanCollide = true;
                 }
 
                 _contents.ForceRemove(entity);
 
                 if (entity.Transform.Parent == Owner.Transform)
                 {
-                    ContainerHelpers.AttachParentToContainerOrGrid(entity.Transform);
+                    entity.Transform.AttachParentToContainerOrGrid();
                 }
+            }
+
+            if (Owner.Transform.Coordinates.TryGetTileAtmosphere(out var tileAtmos) &&
+                tileAtmos.Air != null)
+            {
+                tileAtmos.AssumeAir(Air);
+                Air.Clear();
             }
 
             Owner.Delete();
@@ -158,19 +185,6 @@ namespace Content.Server.GameObjects.Components.Disposal
                     break;
                 }
             }
-        }
-
-        public override void OnRemove()
-        {
-            base.OnRemove();
-            ExitDisposals();
-        }
-
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            _contents = ContainerManagerComponent.Ensure<Container>(nameof(DisposalHolderComponent), Owner);
         }
     }
 }

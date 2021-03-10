@@ -1,15 +1,15 @@
-﻿using System;
+#nullable enable
+using System;
 using Content.Server.GameObjects.Components.NodeContainer.NodeGroups;
 using Content.Shared.GameObjects.Components.Power;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Server.GameObjects;
-using Robust.Server.Interfaces.GameObjects;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.Map;
 using Robust.Shared.IoC;
 using Robust.Shared.Localization;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Utility;
 using Robust.Shared.ViewVariables;
 
@@ -23,23 +23,26 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
     {
         [Dependency] private readonly IServerEntityManager _serverEntityManager = default!;
 
-        public override string Name => "PowerReceiver";
+        [ViewVariables] [ComponentDependency] private readonly IPhysicsComponent? _physicsComponent = null;
 
-        public event EventHandler<PowerStateEventArgs> OnPowerStateChanged;
+        public override string Name => "PowerReceiver";
 
         [ViewVariables]
         public bool Powered => (HasApcPower || !NeedsPower) && !PowerDisabled;
 
+        /// <summary>
+        ///     If this is being powered by an Apc.
+        /// </summary>
         [ViewVariables]
-        public bool HasApcPower { get => _hasApcPower; set => SetHasApcPower(value); }
-        private bool _hasApcPower;
+        public bool HasApcPower { get; private set; }
 
         /// <summary>
         ///     The max distance from a <see cref="PowerProviderComponent"/> that this can receive power from.
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
         public int PowerReceptionRange { get => _powerReceptionRange; set => SetPowerReceptionRange(value); }
-        private int _powerReceptionRange;
+        [DataField("powerReceptionRange")]
+        private int _powerReceptionRange = 3;
 
         [ViewVariables]
         public IPowerProvider Provider { get => _provider; set => SetProvider(value); }
@@ -50,7 +53,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
         /// </summary>
         public bool Connectable => Anchored;
 
-        private bool Anchored => !Owner.TryGetComponent<ICollidableComponent>(out var collidable) || collidable.Anchored;
+        private bool Anchored => _physicsComponent == null || _physicsComponent.Anchored;
 
         [ViewVariables]
         public bool NeedsProvider { get; private set; } = true;
@@ -60,30 +63,24 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
         public int Load { get => _load; set => SetLoad(value); }
-        private int _load;
+        [DataField("powerLoad")]
+        private int _load = 5;
 
         /// <summary>
         ///     When false, causes this to appear powered even if not receiving power from an Apc.
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
         public bool NeedsPower { get => _needsPower; set => SetNeedsPower(value); }
-        private bool _needsPower;
+        [DataField("needsPower")]
+        private bool _needsPower = true;
 
         /// <summary>
         ///     When true, causes this to never appear powered.
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
         public bool PowerDisabled { get => _powerDisabled; set => SetPowerDisabled(value); }
+        [DataField("powerDisabled")]
         private bool _powerDisabled;
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _powerReceptionRange, "powerReceptionRange", 3);
-            serializer.DataField(ref _load, "powerLoad", 5);
-            serializer.DataField(ref _needsPower, "needsPower", true);
-            serializer.DataField(ref _powerDisabled, "powerDisabled", false);
-        }
 
         protected override void Startup()
         {
@@ -92,19 +89,14 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
             {
                 TryFindAndSetProvider();
             }
-            if (Owner.TryGetComponent<ICollidableComponent>(out var collidable))
+            if (_physicsComponent != null)
             {
                 AnchorUpdate();
-                collidable.AnchoredChanged += AnchorUpdate;
             }
         }
 
         public override void OnRemove()
         {
-            if (Owner.TryGetComponent<ICollidableComponent>(out var collidable))
-            {
-                collidable.AnchoredChanged -= AnchorUpdate;
-            }
             _provider.RemoveReceiver(this);
             base.OnRemove();
         }
@@ -115,6 +107,25 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
             {
                 Provider = provider;
             }
+        }
+
+        public override void HandleMessage(ComponentMessage message, IComponent? component)
+        {
+            base.HandleMessage(message, component);
+            switch (message)
+            {
+                case AnchoredChangedMessage:
+                    AnchorUpdate();
+                    break;
+            }
+        }
+
+        public void ApcPowerChanged()
+        {
+            var oldPowered = Powered;
+            HasApcPower = Provider.HasApcPower;
+            if (Powered != oldPowered)
+                OnNewPowerState();
         }
 
         private bool TryFindAvailableProvider(out IPowerProvider foundProvider)
@@ -139,7 +150,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
                     }
                 }
             }
-            foundProvider = default;
+            foundProvider = default!;
             return false;
         }
 
@@ -148,7 +159,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
             _provider.RemoveReceiver(this);
             _provider = PowerProviderComponent.NullProvider;
             NeedsProvider = true;
-            HasApcPower = false;
+            ApcPowerChanged();
         }
 
         private void SetProvider(IPowerProvider newProvider)
@@ -157,16 +168,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
             _provider = newProvider;
             newProvider.AddReceiver(this);
             NeedsProvider = false;
-        }
-
-        private void SetHasApcPower(bool newHasApcPower)
-        {
-            var oldPowered = Powered;
-            _hasApcPower = newHasApcPower;
-            if (oldPowered != Powered)
-            {
-                OnNewPowerState();
-            }
+            ApcPowerChanged();
         }
 
         private void SetPowerReceptionRange(int newPowerReceptionRange)
@@ -178,6 +180,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
 
         private void SetLoad(int newLoad)
         {
+            Provider.UpdateReceiverLoad(Load, newLoad);
             _load = newLoad;
         }
 
@@ -203,8 +206,9 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
 
         private void OnNewPowerState()
         {
-            OnPowerStateChanged?.Invoke(this, new PowerStateEventArgs(Powered));
-            if (Owner.TryGetComponent(out AppearanceComponent appearance))
+            SendMessage(new PowerChangedMessage(Powered));
+
+            if (Owner.TryGetComponent<AppearanceComponent>(out var appearance))
             {
                 appearance.SetData(PowerDeviceVisuals.Powered, Powered);
             }
@@ -224,21 +228,21 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents
                 ClearProvider();
             }
         }
+
         ///<summary>
         ///Adds some markup to the examine text of whatever object is using this component to tell you if it's powered or not, even if it doesn't have an icon state to do this for you.
         ///</summary>
-
         public void Examine(FormattedMessage message, bool inDetailsRange)
         {
-            message.AddMarkup(Loc.GetString("It appears to be {0}.", this.Powered ? "[color=darkgreen]powered[/color]" : "[color=darkred]un-powered[/color]"));
+            message.AddMarkup(Loc.GetString("It appears to be {0}.", Powered ? "[color=darkgreen]powered[/color]" : "[color=darkred]un-powered[/color]"));
         }
     }
 
-    public class PowerStateEventArgs : EventArgs
+    public class PowerChangedMessage : ComponentMessage
     {
         public readonly bool Powered;
 
-        public PowerStateEventArgs(bool powered)
+        public PowerChangedMessage(bool powered)
         {
             Powered = powered;
         }

@@ -1,20 +1,15 @@
 ﻿using System.Linq;
-using Content.Server.GameObjects.Components.Fluids;
 using Content.Shared.Chemistry;
 using Content.Shared.GameObjects.Components;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Content.Shared.Physics;
-using Microsoft.DiaSymReader;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
 using Robust.Shared.IoC;
-using Robust.Shared.Log;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Chemistry
@@ -28,7 +23,8 @@ namespace Content.Server.GameObjects.Components.Chemistry
         [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
 
         [ViewVariables]
-        private ReagentUnit _transferAmount;
+        [DataField("transferAmount")]
+        private ReagentUnit _transferAmount = ReagentUnit.New(0.5);
 
         private bool _reached;
         private float _reactTimer;
@@ -43,11 +39,7 @@ namespace Content.Server.GameObjects.Components.Chemistry
         {
             base.Initialize();
 
-            if (!Owner.EnsureComponent(out SolutionContainerComponent _))
-            {
-                Logger.Warning(
-                    $"Entity {Owner.Name} at {Owner.Transform.MapPosition} didn't have a {nameof(SolutionContainerComponent)}");
-            }
+            Owner.EnsureComponentWarn(out SolutionContainerComponent _);
         }
 
         public void Start(Vector2 dir, float velocity, EntityCoordinates target, float aliveTime)
@@ -58,17 +50,11 @@ namespace Content.Server.GameObjects.Components.Chemistry
             _velocity = velocity;
             _aliveTime = aliveTime;
             // Set Move
-            if (Owner.TryGetComponent(out ICollidableComponent collidable))
+            if (Owner.TryGetComponent(out IPhysicsComponent physics))
             {
-                var controller = collidable.EnsureController<VaporController>();
+                var controller = physics.EnsureController<VaporController>();
                 controller.Move(_direction, _velocity);
             }
-        }
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _transferAmount, "transferAmount", ReagentUnit.New(0.5));
         }
 
         public void Update(float frameTime)
@@ -82,12 +68,12 @@ namespace Content.Server.GameObjects.Components.Chemistry
             _timer += frameTime;
             _reactTimer += frameTime;
 
-            if (_reactTimer >= ReactTime && Owner.TryGetComponent(out ICollidableComponent collidable))
+            if (_reactTimer >= ReactTime && Owner.TryGetComponent(out IPhysicsComponent physics))
             {
                 _reactTimer = 0;
                 var mapGrid = _mapManager.GetGrid(Owner.Transform.GridID);
 
-                var tile = mapGrid.GetTileRef(Owner.Transform.Coordinates.ToMapIndices(Owner.EntityManager, _mapManager));
+                var tile = mapGrid.GetTileRef(Owner.Transform.Coordinates.ToVector2i(Owner.EntityManager, _mapManager));
                 foreach (var reagentQuantity in contents.ReagentList.ToArray())
                 {
                     if (reagentQuantity.Quantity == ReagentUnit.Zero) continue;
@@ -101,7 +87,7 @@ namespace Content.Server.GameObjects.Components.Chemistry
             {
                 _reached = true;
 
-                if (Owner.TryGetComponent(out ICollidableComponent coll))
+                if (Owner.TryGetComponent(out IPhysicsComponent coll))
                 {
                     var controller = coll.EnsureController<VaporController>();
                     controller.Stop();
@@ -142,19 +128,14 @@ namespace Content.Server.GameObjects.Components.Chemistry
             if (!Owner.TryGetComponent(out SolutionContainerComponent contents))
                 return;
 
-            foreach (var reagentQuantity in contents.ReagentList.ToArray())
-            {
-                if (reagentQuantity.Quantity == ReagentUnit.Zero) continue;
-                var reagent = _prototypeManager.Index<ReagentPrototype>(reagentQuantity.ReagentId);
-                contents.TryRemoveReagent(reagentQuantity.ReagentId, reagent.ReactionEntity(collidedWith, ReactionMethod.Touch, reagentQuantity.Quantity * 0.125f));
-            }
+            contents.Solution.DoEntityReaction(collidedWith, ReactionMethod.Touch);
 
             // Check for collision with a impassable object (e.g. wall) and stop
-            if (collidedWith.TryGetComponent(out ICollidableComponent collidable))
+            if (collidedWith.TryGetComponent(out IPhysicsComponent physics))
             {
-                if ((collidable.CollisionLayer & (int) CollisionGroup.Impassable) != 0 && collidable.Hard)
+                if ((physics.CollisionLayer & (int) CollisionGroup.Impassable) != 0 && physics.Hard)
                 {
-                    if (Owner.TryGetComponent(out ICollidableComponent coll))
+                    if (Owner.TryGetComponent(out IPhysicsComponent coll))
                     {
                         var controller = coll.EnsureController<VaporController>();
                         controller.Stop();

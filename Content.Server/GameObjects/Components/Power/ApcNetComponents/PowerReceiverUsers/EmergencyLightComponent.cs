@@ -1,11 +1,13 @@
-﻿using System;
+#nullable enable
+using System;
 using System.Collections.Generic;
 using Content.Shared.GameObjects.EntitySystems;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Localization;
-using Robust.Shared.Log;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Utility;
 using Robust.Shared.ViewVariables;
 
@@ -20,27 +22,35 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
         public override string Name => "EmergencyLight";
 
         [ViewVariables]
-        private EmergencyLightState _lightState = EmergencyLightState.Charging;
-
-        [ViewVariables(VVAccess.ReadWrite)]
-        private float _wattage;
-        [ViewVariables(VVAccess.ReadWrite)]
-        private float _chargingWattage;
-        [ViewVariables(VVAccess.ReadWrite)]
-        private float _chargingEfficiency;
-
-        public override void ExposeData(ObjectSerializer serializer)
+        private EmergencyLightState State
         {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _wattage, "wattage", 5);
-            serializer.DataField(ref _chargingWattage, "chargingWattage", 60);
-            serializer.DataField(ref _chargingEfficiency, "chargingEfficiency", 0.85f);
+            get => _state;
+            set
+            {
+                if (_state == value)
+                    return;
+
+                _state = value;
+                Owner.EntityManager.EventBus.RaiseEvent(EventSource.Local, new EmergencyLightMessage(this, _state));
+            }
         }
+
+        private EmergencyLightState _state = EmergencyLightState.Empty;
+
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("wattage")]
+        private float _wattage = 5;
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("chargingWattage")]
+        private float _chargingWattage = 60;
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("chargingEfficiency")]
+        private float _chargingEfficiency = 0.85f;
 
         /// <summary>
         ///     For attaching UpdateState() to events.
         /// </summary>
-        public void UpdateState(object sender, EventArgs e)
+        public void UpdateState(PowerChangedMessage e)
         {
             UpdateState();
         }
@@ -50,7 +60,7 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
         /// </summary>
         public void UpdateState()
         {
-            if (!Owner.TryGetComponent(out PowerReceiverComponent receiver))
+            if (!Owner.TryGetComponent(out PowerReceiverComponent? receiver))
             {
                 return;
             }
@@ -59,30 +69,27 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
             {
                 receiver.Load = (int) Math.Abs(_wattage);
                 TurnOff();
-                _lightState = EmergencyLightState.Charging;
+                State = EmergencyLightState.Charging;
             }
             else
             {
                 TurnOn();
-                _lightState = EmergencyLightState.On;
+                State = EmergencyLightState.On;
             }
         }
 
         public void OnUpdate(float frameTime)
         {
-            if (_lightState == EmergencyLightState.Empty
-                || _lightState == EmergencyLightState.Full) return;
-
-            if (!Owner.TryGetComponent(out BatteryComponent battery))
+            if (Owner.Deleted || !Owner.TryGetComponent(out BatteryComponent? battery))
             {
                 return;
             }
 
-            if(_lightState == EmergencyLightState.On)
+            if(State == EmergencyLightState.On)
             {
                 if (!battery.TryUseCharge(_wattage * frameTime))
                 {
-                    _lightState = EmergencyLightState.Empty;
+                    State = EmergencyLightState.Empty;
                     TurnOff();
                 }
             }
@@ -91,24 +98,24 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
                 battery.CurrentCharge += _chargingWattage * frameTime * _chargingEfficiency;
                 if (battery.BatteryState == BatteryState.Full)
                 {
-                    if (Owner.TryGetComponent(out PowerReceiverComponent receiver))
+                    if (Owner.TryGetComponent(out PowerReceiverComponent? receiver))
                     {
                         receiver.Load = 1;
                     }
 
-                    _lightState = EmergencyLightState.Full;
+                    State = EmergencyLightState.Full;
                 }
             }
         }
 
         private void TurnOff()
         {
-            if (Owner.TryGetComponent(out SpriteComponent sprite))
+            if (Owner.TryGetComponent(out SpriteComponent? sprite))
             {
                 sprite.LayerSetState(0, "emergency_light_off");
             }
 
-            if (Owner.TryGetComponent(out PointLightComponent light))
+            if (Owner.TryGetComponent(out PointLightComponent? light))
             {
                 light.Enabled = false;
             }
@@ -116,42 +123,31 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
 
         private void TurnOn()
         {
-            if (Owner.TryGetComponent(out SpriteComponent sprite))
+            if (Owner.TryGetComponent(out SpriteComponent? sprite))
             {
                 sprite.LayerSetState(0, "emergency_light_on");
             }
 
-            if (Owner.TryGetComponent(out PointLightComponent light))
+            if (Owner.TryGetComponent(out PointLightComponent? light))
             {
                 light.Enabled = true;
             }
         }
 
-        public override void Initialize()
+        public override void HandleMessage(ComponentMessage message, IComponent? component)
         {
-            base.Initialize();
-
-            if (!Owner.EnsureComponent(out PowerReceiverComponent receiver))
+            base.HandleMessage(message, component);
+            switch (message)
             {
-                Logger.Warning($"Entity {Owner.Name} at {Owner.Transform.MapPosition} didn't have a {nameof(PowerReceiverComponent)}");
+                case PowerChangedMessage powerChanged:
+                    UpdateState(powerChanged);
+                    break;
             }
-
-            receiver.OnPowerStateChanged += UpdateState;
-        }
-
-        public override void OnRemove()
-        {
-            if (Owner.TryGetComponent(out PowerReceiverComponent receiver))
-            {
-                receiver.OnPowerStateChanged -= UpdateState;
-            }
-
-            base.OnRemove();
         }
 
         void IExamine.Examine(FormattedMessage message, bool inDetailsRange)
         {
-            message.AddMarkup(Loc.GetString($"The battery indicator displays: {BatteryStateText[_lightState]}."));
+            message.AddMarkup(Loc.GetString($"The battery indicator displays: {BatteryStateText[State]}."));
         }
 
         public enum EmergencyLightState
@@ -162,12 +158,25 @@ namespace Content.Server.GameObjects.Components.Power.ApcNetComponents.PowerRece
             On
         }
 
-        public Dictionary<EmergencyLightState, string> BatteryStateText = new Dictionary<EmergencyLightState, string>
+        public Dictionary<EmergencyLightState, string> BatteryStateText = new()
         {
             { EmergencyLightState.Full, "[color=darkgreen]Full[/color]"},
             { EmergencyLightState.Empty, "[color=darkred]Empty[/color]"},
             { EmergencyLightState.Charging, "[color=darkorange]Charging[/color]"},
             { EmergencyLightState.On, "[color=darkorange]Discharging[/color]"}
         };
+    }
+
+    public sealed class EmergencyLightMessage : EntitySystemMessage
+    {
+        public EmergencyLightComponent Component { get; }
+
+        public EmergencyLightComponent.EmergencyLightState State { get; }
+
+        public EmergencyLightMessage(EmergencyLightComponent component, EmergencyLightComponent.EmergencyLightState state)
+        {
+            Component = component;
+            State = state;
+        }
     }
 }

@@ -5,8 +5,8 @@
   description: A storage tank containing welding fuel.
   components:
   - type: Sprite
-    texture: Constructible/Misc/weldtank.png
-
+    sprite: Constructible/Misc/tanks.rsi
+    state: fueltank
   - type: Explosive
     devastationRange: 0
     heavyImpactRange: 2
@@ -17,9 +17,7 @@
       reagents:
       - ReagentId: chem.WeldingFuel
         Quantity: 1500
-  - type: DamageOnToolInteract
-    damage: 200
-    tools:
-    - Welding
   - type: Anchorable
   - type: Pullable
+  - type: ReagentTank
+    tankType: Fuel

@@ -5,21 +5,26 @@ using Content.Server.GameObjects.Components.Metabolism;
 using Content.Server.Interfaces;
 using Content.Shared.Atmos;
 using Content.Shared.Chemistry;
+using Content.Shared.GameObjects.Components.Body.Networks;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Body.Circulatory
 {
     [RegisterComponent]
-    public class BloodstreamComponent : Component, IGasMixtureHolder
+    [ComponentReference(typeof(SharedBloodstreamComponent))]
+    public class BloodstreamComponent : SharedBloodstreamComponent, IGasMixtureHolder
     {
         public override string Name => "Bloodstream";
 
         /// <summary>
         ///     Max volume of internal solution storage
         /// </summary>
-        [ViewVariables] private ReagentUnit _initialMaxVolume;
+        [DataField("maxVolume")]
+        [ViewVariables] private ReagentUnit _initialMaxVolume = ReagentUnit.New(250);
 
         /// <summary>
         ///     Internal solution for reagent storage
@@ -31,7 +36,9 @@ namespace Content.Server.GameObjects.Components.Body.Circulatory
         /// </summary>
         [ViewVariables] public ReagentUnit EmptyVolume => _internalSolution.EmptyVolume;
 
-        [ViewVariables] public GasMixture Air { get; set; }
+        [ViewVariables]
+        public GasMixture Air { get; set; } = new(6)
+            {Temperature = Atmospherics.NormalBodyTemperature};
 
         [ViewVariables] public SolutionContainerComponent Solution => _internalSolution;
 
@@ -43,22 +50,13 @@ namespace Content.Server.GameObjects.Components.Body.Circulatory
             _internalSolution.MaxVolume = _initialMaxVolume;
         }
 
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            Air = new GasMixture(6) {Temperature = Atmospherics.NormalBodyTemperature};
-
-            serializer.DataField(ref _initialMaxVolume, "maxVolume", ReagentUnit.New(250));
-        }
-
         /// <summary>
         ///     Attempt to transfer provided solution to internal solution.
         ///     Only supports complete transfers
         /// </summary>
         /// <param name="solution">Solution to be transferred</param>
         /// <returns>Whether or not transfer was a success</returns>
-        public bool TryTransferSolution(Solution solution)
+        public override bool TryTransferSolution(Solution solution)
         {
             // For now doesn't support partial transfers
             if (solution.TotalVolume + _internalSolution.CurrentVolume > _internalSolution.MaxVolume)
@@ -66,7 +64,7 @@ namespace Content.Server.GameObjects.Components.Body.Circulatory
                 return false;
             }
 
-            _internalSolution.TryAddSolution(solution, false, true);
+            _internalSolution.TryAddSolution(solution);
             return true;
         }
 

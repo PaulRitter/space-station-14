@@ -14,10 +14,10 @@
         map: ["enum.RangedBarrelVisualLayers.Bolt"]
       - state: mag-0
         map: ["enum.RangedBarrelVisualLayers.Mag"]
-
+  - type: Icon
+    state: icon
   - type: Item
     size: 12
-    state: icon
   - type: MagazineBarrel
     caliber: Pistol
     magazineTypes:
@@ -50,11 +50,12 @@
   name: clarissa
   parent: PistolBase
   id: PistolClarissa
-  description:
+  description: A small, easily concealable, but somewhat underpowered gun.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/clarissa.rsi
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/clarissa.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/clarissa.rsi
@@ -74,7 +75,7 @@
   name: colt M1911
   parent: PistolBase
   id: PistolColt
-  description:
+  description: An outdated but classic pistol.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/colt.rsi
@@ -83,7 +84,8 @@
         map: ["enum.RangedBarrelVisualLayers.Base"]
       - state: bolt-closed
         map: ["enum.RangedBarrelVisualLayers.Bolt"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/colt.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/colt.rsi
@@ -105,11 +107,12 @@
   name: giskard
   parent: PistolBase
   id: PistolGiskard
-  description: A popular "Frozen Star" brand pocket pistol chambered for the ubiquitous .35 auto round. Uses standard capacity magazines.
+  description: A popular "Frozen Star" brand pocket pistol.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/giskard.rsi
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/giskard.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/giskard.rsi
@@ -126,7 +129,7 @@
 
 - type: entity
   name: handmade pistol
-  parent: BaseItem
+  parent: PistolBase
   id: PistolHMPistol
   description: Looks unreliable.
   components:
@@ -138,7 +141,8 @@
         map: ["enum.RangedBarrelVisualLayers.Base"]
       - state: bolt-closed
         map: ["enum.RangedBarrelVisualLayers.Bolt"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/hm_pistol.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/hm_pistol.rsi
@@ -150,7 +154,6 @@
     - Single
     magazineTypes:
     - Pistol
-    capacity: 1
     fireRate: 8
     minAngle: 10
     maxAngle: 60
@@ -181,7 +184,8 @@
       map: ["enum.RangedBarrelVisualLayers.Base"]
     - state: mag-0
       map: ["enum.RangedBarrelVisualLayers.Mag"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/gyro_pistol.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/gyro_pistol.rsi
@@ -213,7 +217,7 @@
   name: mandella
   parent: PistolBase
   id: PistolMandella
-  description: A rugged, robust operator handgun with inbuilt silencer. Chambered in caseless rifle ammunition, this time-tested handgun is your absolute choice if you need to take someone down silently, as it's deadly, produces no sound, and leaves no trace.
+  description: A rugged, robust operator handgun with inbuilt silencer.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/mandella.rsi
@@ -224,7 +228,8 @@
       map: ["enum.RangedBarrelVisualLayers.Bolt"]
     - state: mag-0
       map: ["enum.RangedBarrelVisualLayers.Mag"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/mandella.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/mandella.rsi
@@ -246,7 +251,7 @@
   name: mk 58
   parent: PistolBase
   id: PistolMk58
-  description: The NT Mk58 is a cheap, ubiquitous sidearm, that was produced by a NanoTrasen subsidiary.
+  description: A cheap, ubiquitous sidearm, produced by a NanoTrasen subsidiary.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
@@ -255,7 +260,8 @@
       map: ["enum.RangedBarrelVisualLayers.Base"]
     - state: bolt-closed
       map: ["enum.RangedBarrelVisualLayers.Bolt"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/mk58.rsi
@@ -277,7 +283,7 @@
   name: mk 58 (wood)
   parent: PistolBase
   id: PistolMk58Wood
-  description: The NT Mk58 is a cheap, ubiquitous sidearm, that was produced by a NanoTrasen subsidiary.
+  description: A cheap, ubiquitous sidearm, that was produced by a NanoTrasen subsidiary.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/mk58_wood.rsi
@@ -286,7 +292,8 @@
       map: ["enum.RangedBarrelVisualLayers.Base"]
     - state: bolt-closed
       map: ["enum.RangedBarrelVisualLayers.Bolt"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/mk58_wood.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/mk58_wood.rsi
@@ -308,11 +315,12 @@
   name: molly
   parent: PistolBase
   id: PistolMolly
-  description: An experimental fully automatic pistol, designed as a middle ground between SMGs and Pistols. Primarily employed in CQC scenarios or as a civilian self defence tool. Takes both highcap pistol and smg mags.
+  description: An experimental fully automatic pistol.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/molly.rsi
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/molly.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/molly.rsi
@@ -337,7 +345,7 @@
   name: olivaw
   parent: PistolBase
   id: PistolOlivaw
-  description: A popular "Frozen Star" machine pistol. This one has a two-round burst-fire mode and is chambered for .35 auto. It can use normal and high capacity magazines.
+  description: A popular "Frozen Star" machine pistol.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/olivaw_civil.rsi
@@ -346,7 +354,8 @@
       map: ["enum.RangedBarrelVisualLayers.Base"]
     - state: bolt-closed
       map: ["enum.RangedBarrelVisualLayers.Bolt"]
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/olivaw_civil.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/olivaw_civil.rsi
@@ -369,11 +378,12 @@
   name: paco
   parent: PistolBase
   id: PistolPaco
-  description: A modern and reliable sidearm for the soldier in the field. Commonly issued as a sidearm to Ironhammer Operatives.
+  description: A modern and reliable sidearm for the soldier in the field.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Pistols/paco.rsi
-
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Pistols/paco.rsi
   - type: Item
     size: 12
     sprite: Objects/Weapons/Guns/Pistols/paco.rsi

@@ -1,17 +1,16 @@
 ﻿using Content.Client.GameObjects.Components.Disposal;
-using Content.Client.Interfaces.GameObjects.Components.Interaction;
 using Content.Shared.GameObjects;
 using Content.Shared.GameObjects.Components.Items;
+using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Client.Graphics;
-using Robust.Client.Interfaces.ResourceManagement;
 using Robust.Client.ResourceManagement;
 using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components.Renderable;
-using Robust.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.IoC;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.Utility;
 using Robust.Shared.ViewVariables;
 
@@ -19,15 +18,22 @@ namespace Content.Client.GameObjects.Components.Items
 {
     [RegisterComponent]
     [ComponentReference(typeof(IItemComponent))]
-    public class ItemComponent : Component, IItemComponent, IClientDraggable
+    public class ItemComponent : Component, IItemComponent, IDraggable
     {
+        [Dependency] private readonly IResourceCache _resourceCache = default!;
+
         public override string Name => "Item";
         public override uint? NetID => ContentNetIDs.ITEM;
 
-        [ViewVariables] protected ResourcePath RsiPath;
+        [ViewVariables]
+        [DataField("sprite")]
+        protected ResourcePath RsiPath;
 
-        [ViewVariables(VVAccess.ReadWrite)] protected Color Color;
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("color")]
+        protected Color Color = Color.White;
 
+        [DataField("HeldPrefix")]
         private string _equippedPrefix;
 
         [ViewVariables(VVAccess.ReadWrite)]
@@ -37,7 +43,7 @@ namespace Content.Client.GameObjects.Components.Items
             set
             {
                 _equippedPrefix = value;
-                if (!ContainerHelpers.TryGetContainer(Owner, out IContainer container)) return;
+                if (!Owner.TryGetContainer(out IContainer container)) return;
                 if(container.Owner.TryGetComponent(out HandsComponent hands))
                     hands.RefreshInHands();
             }
@@ -61,19 +67,9 @@ namespace Content.Client.GameObjects.Components.Items
             return null;
         }
 
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataFieldCached(ref Color, "color", Color.White);
-            serializer.DataFieldCached(ref RsiPath, "sprite", null);
-            serializer.DataFieldCached(ref _equippedPrefix, "HeldPrefix", null);
-        }
-
         protected RSI GetRSI()
         {
-            var resourceCache = IoCManager.Resolve<IResourceCache>();
-            return resourceCache.GetResource<RSIResource>(SharedSpriteComponent.TextureRoot / RsiPath).RSI;
+            return _resourceCache.GetResource<RSIResource>(SharedSpriteComponent.TextureRoot / RsiPath).RSI;
         }
 
         public override void HandleComponentState(ComponentState curState, ComponentState nextState)
@@ -85,14 +81,15 @@ namespace Content.Client.GameObjects.Components.Items
             EquippedPrefix = itemComponentState.EquippedPrefix;
         }
 
-        bool IClientDraggable.ClientCanDropOn(CanDropEventArgs eventArgs)
+        bool IDraggable.CanDrop(CanDropEventArgs args)
         {
-            return eventArgs.Target.HasComponent<DisposalUnitComponent>();
+            return args.Target.HasComponent<DisposalUnitComponent>();
         }
 
-        bool IClientDraggable.ClientCanDrag(CanDragEventArgs eventArgs)
+        bool IDraggable.Drop(DragDropEventArgs args)
         {
-            return true;
+            // TODO: Shared item class
+            return false;
         }
     }
 }

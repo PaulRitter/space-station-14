@@ -1,18 +1,13 @@
 using System;
 using Content.Shared.Damage;
 using Content.Shared.Physics;
-using Robust.Server.GameObjects.EntitySystems;
+using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.EntitySystemMessages;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Timing;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
-using Robust.Shared.Physics;
-using Robust.Shared.Serialization;
-using Robust.Shared.Timers;
+using Robust.Shared.Timing;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.GameObjects.Components.Projectiles
 {
@@ -26,38 +21,34 @@ namespace Content.Server.GameObjects.Components.Projectiles
 
         public override string Name => "Hitscan";
         public CollisionGroup CollisionMask => (CollisionGroup) _collisionMask;
-        private int _collisionMask;
+
+        [DataField("layers")] //todo  WithFormat.Flags<CollisionLayer>()
+        private int _collisionMask = (int) CollisionGroup.Opaque;
 
         public float Damage
         {
             get => _damage;
             set => _damage = value;
         }
-        private float _damage;
+        [DataField("damage")]
+        private float _damage = 10f;
         public DamageType DamageType => _damageType;
-        private DamageType _damageType;
+        [DataField("damageType")]
+        private DamageType _damageType = DamageType.Heat;
         public float MaxLength => 20.0f;
 
         private TimeSpan _startTime;
         private TimeSpan _deathTime;
 
         public float ColorModifier { get; set; } = 1.0f;
-        private string _spriteName;
+        [DataField("spriteName")]
+        private string _spriteName = "Objects/Weapons/Guns/Projectiles/laser.png";
+        [DataField("muzzleFlash")]
         private string _muzzleFlash;
+        [DataField("impactFlash")]
         private string _impactFlash;
-        private string _soundHitWall;
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _collisionMask, "layers", (int) CollisionGroup.Opaque, WithFormat.Flags<CollisionLayer>());
-            serializer.DataField(ref _damage, "damage", 10.0f);
-            serializer.DataField(ref _damageType, "damageType", DamageType.Heat);
-            serializer.DataField(ref _spriteName, "spriteName", "Objects/Weapons/Guns/Projectiles/laser.png");
-            serializer.DataField(ref _muzzleFlash, "muzzleFlash", null);
-            serializer.DataField(ref _impactFlash, "impactFlash", null);
-            serializer.DataField(ref _soundHitWall, "soundHitWall", "/Audio/Weapons/Guns/Hits/laser_sear_wall.ogg");
-        }
+        [DataField("soundHitWall")]
+        private string _soundHitWall = "/Audio/Weapons/Guns/Hits/laser_sear_wall.ogg";
 
         public void FireEffects(IEntity user, float distance, Angle angle, IEntity hitEntity = null)
         {
@@ -94,7 +85,7 @@ namespace Content.Server.GameObjects.Components.Projectiles
                 EntitySystem.Get<AudioSystem>().PlayAtCoords(_soundHitWall, user.Transform.Coordinates.Offset(offset));
             }
 
-            Timer.Spawn((int) _deathTime.TotalMilliseconds, () =>
+            Owner.SpawnTimer((int) _deathTime.TotalMilliseconds, () =>
             {
                 if (!Owner.Deleted)
                 {

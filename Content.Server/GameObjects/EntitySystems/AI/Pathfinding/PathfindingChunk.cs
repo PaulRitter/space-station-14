@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Timing;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
+using Robust.Shared.Timing;
 
 namespace Content.Server.GameObjects.EntitySystems.AI.Pathfinding
 {
@@ -26,15 +24,15 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Pathfinding
         public TimeSpan LastUpdate { get; private set; }
         public GridId GridId { get; }
 
-        public MapIndices Indices => _indices;
-        private readonly MapIndices _indices;
+        public Vector2i Indices => _indices;
+        private readonly Vector2i _indices;
 
         // Nodes per chunk row
         public static int ChunkSize => 8;
         public PathfindingNode[,] Nodes => _nodes;
-        private PathfindingNode[,] _nodes = new PathfindingNode[ChunkSize,ChunkSize];
+        private readonly PathfindingNode[,] _nodes = new PathfindingNode[ChunkSize,ChunkSize];
 
-        public PathfindingChunk(GridId gridId, MapIndices indices)
+        public PathfindingChunk(GridId gridId, Vector2i indices)
         {
             GridId = gridId;
             _indices = indices;
@@ -46,7 +44,7 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Pathfinding
             {
                 for (var y = 0; y < ChunkSize; y++)
                 {
-                    var tileRef = mapGrid.GetTileRef(new MapIndices(x + _indices.X, y + _indices.Y));
+                    var tileRef = mapGrid.GetTileRef(new Vector2i(x + _indices.X, y + _indices.Y));
                     CreateNode(tileRef);
                 }
             }
@@ -75,7 +73,7 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Pathfinding
                 {
                     if (x == 0 && y == 0) continue;
                     var (neighborX, neighborY) = (_indices.X + ChunkSize * x, _indices.Y + ChunkSize * y);
-                    if (chunkGrid.TryGetValue(new MapIndices(neighborX, neighborY), out var neighbor))
+                    if (chunkGrid.TryGetValue(new Vector2i(neighborX, neighborY), out var neighbor))
                     {
                         yield return neighbor;
                     }
@@ -83,10 +81,10 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Pathfinding
             }
         }
 
-        public bool InBounds(MapIndices mapIndices)
+        public bool InBounds(Vector2i Vector2i)
         {
-            if (mapIndices.X < _indices.X || mapIndices.Y < _indices.Y) return false;
-            if (mapIndices.X >= _indices.X + ChunkSize || mapIndices.Y >= _indices.Y + ChunkSize) return false;
+            if (Vector2i.X < _indices.X || Vector2i.Y < _indices.Y) return false;
+            if (Vector2i.X >= _indices.X + ChunkSize || Vector2i.Y >= _indices.Y + ChunkSize) return false;
             return true;
         }
 

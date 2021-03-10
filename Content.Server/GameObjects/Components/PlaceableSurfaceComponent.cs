@@ -1,32 +1,90 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Shared.GameObjects.Components;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization;
+using Robust.Shared.Maths;
+using Robust.Shared.Players;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components
 {
     [RegisterComponent]
+    [ComponentReference(typeof(SharedPlaceableSurfaceComponent))]
     public class PlaceableSurfaceComponent : SharedPlaceableSurfaceComponent, IInteractUsing
     {
-        private bool _isPlaceable;
+        [DataField("placeCentered")]
+        private bool _placeCentered;
+
+        [DataField("positionOffset")]
+        private Vector2 _positionOffset;
+
+        [DataField("IsPlaceable")]
+        private bool _isPlaceable = true;
+
         [ViewVariables(VVAccess.ReadWrite)]
-        public bool IsPlaceable { get => _isPlaceable; set => _isPlaceable = value; }
-
-        [ViewVariables]
-        int IInteractUsing.Priority => 1;
-
-        public override void ExposeData(ObjectSerializer serializer)
+        public override bool IsPlaceable
         {
-            base.ExposeData(serializer);
+            get => _isPlaceable;
+            set
+            {
+                if (_isPlaceable == value)
+                {
+                    return;
+                }
 
-            serializer.DataField(ref _isPlaceable, "IsPlaceable", true);
+                _isPlaceable = value;
+
+                Dirty();
+            }
         }
 
+        [ViewVariables(VVAccess.ReadWrite)]
+        public override bool PlaceCentered
+        {
+            get => _placeCentered;
+            set
+            {
+                if (_placeCentered == value)
+                {
+                    return;
+                }
 
-        public async Task<bool> InteractUsing(InteractUsingEventArgs eventArgs)
+                _placeCentered = value;
+
+                Dirty();
+
+            }
+        }
+
+        [ViewVariables(VVAccess.ReadWrite)]
+        public override Vector2 PositionOffset
+        {
+            get => _positionOffset;
+            set
+            {
+                if (_positionOffset.EqualsApprox(value))
+                {
+                    return;
+                }
+
+                _positionOffset = value;
+
+                Dirty();
+
+            }
+        }
+
+        [ViewVariables]
+        int IInteractUsing.Priority => -10;
+
+        public override ComponentState GetComponentState(ICommonSession session)
+        {
+            return new PlaceableSurfaceComponentState(_isPlaceable,_placeCentered,_positionOffset);
+        }
+
+        async Task<bool> IInteractUsing.InteractUsing(InteractUsingEventArgs eventArgs)
         {
             if (!IsPlaceable)
                 return false;
@@ -36,7 +94,10 @@ namespace Content.Server.GameObjects.Components
                 return false;
             }
             handComponent.Drop(eventArgs.Using);
-            eventArgs.Using.Transform.WorldPosition = eventArgs.ClickLocation.Position;
+            if (_placeCentered)
+                eventArgs.Using.Transform.WorldPosition = eventArgs.Target.Transform.WorldPosition + _positionOffset;
+            else
+                eventArgs.Using.Transform.WorldPosition = eventArgs.ClickLocation.Position;
             return true;
         }
     }

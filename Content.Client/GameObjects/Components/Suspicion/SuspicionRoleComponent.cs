@@ -1,15 +1,14 @@
 ﻿#nullable enable
 using System.Collections.Generic;
-using System.Linq;
 using Content.Client.UserInterface;
 using Content.Client.UserInterface.Suspicion;
 using Content.Shared.GameObjects.Components.Suspicion;
 using Robust.Client.GameObjects;
+using Robust.Client.Graphics;
+using Robust.Client.ResourceManagement;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Network;
 using Robust.Shared.IoC;
-using Robust.Shared.Players;
+using Robust.Shared.ViewVariables;
 
 namespace Content.Client.GameObjects.Components.Suspicion
 {
@@ -17,17 +16,25 @@ namespace Content.Client.GameObjects.Components.Suspicion
     public class SuspicionRoleComponent : SharedSuspicionRoleComponent
     {
         [Dependency] private readonly IGameHud _gameHud = default!;
-        [Dependency] private readonly IEntityManager _entityManager = default!;
+        [Dependency] private readonly IOverlayManager _overlayManager = default!;
+        [Dependency] private readonly IResourceCache _resourceCache = default!;
+        [Dependency] private readonly IEyeManager _eyeManager = default!;
 
         private SuspicionGui? _gui;
         private string? _role;
         private bool? _antagonist;
+        private bool _overlayActive;
 
         public string? Role
         {
             get => _role;
             set
             {
+                if (_role == value)
+                {
+                    return;
+                }
+
                 _role = value;
                 _gui?.UpdateLabel();
                 Dirty();
@@ -39,25 +46,61 @@ namespace Content.Client.GameObjects.Components.Suspicion
             get => _antagonist;
             set
             {
+                if (_antagonist == value)
+                {
+                    return;
+                }
+
                 _antagonist = value;
                 _gui?.UpdateLabel();
+
+                if (value ?? false)
+                {
+                    AddTraitorOverlay();
+                }
+
                 Dirty();
             }
         }
 
-        public HashSet<IEntity> Allies { get; } = new HashSet<IEntity>();
+        [ViewVariables]
+        public List<(string name, EntityUid uid)> Allies { get; } = new();
+
+        private void AddTraitorOverlay()
+        {
+            if (_overlayManager.HasOverlay(nameof(TraitorOverlay)))
+            {
+                return;
+            }
+
+            _overlayActive = true;
+            var overlay = new TraitorOverlay(Owner.EntityManager, _resourceCache, _eyeManager);
+            _overlayManager.AddOverlay(overlay);
+        }
+
+        private void RemoveTraitorOverlay()
+        {
+            if (!_overlayActive)
+            {
+                return;
+            }
+
+            _overlayManager.RemoveOverlay(nameof(TraitorOverlay));
+        }
 
         public override void HandleComponentState(ComponentState? curState, ComponentState? nextState)
         {
             base.HandleComponentState(curState, nextState);
 
-            if (!(curState is SuspicionRoleComponentState state))
+            if (curState is not SuspicionRoleComponentState state)
             {
                 return;
             }
 
-            _role = state.Role;
-            _antagonist = state.Antagonist;
+            Role = state.Role;
+            Antagonist = state.Antagonist;
+            Allies.Clear();
+            Allies.AddRange(state.Allies);
         }
 
         public override void HandleMessage(ComponentMessage message, IComponent? component)
@@ -79,22 +122,15 @@ namespace Content.Client.GameObjects.Components.Suspicion
                     _gameHud.SuspicionContainer.AddChild(_gui);
                     _gui.UpdateLabel();
 
+                    if (_antagonist ?? false)
+                    {
+                        AddTraitorOverlay();
+                    }
+
                     break;
                 case PlayerDetachedMsg _:
                     _gui?.Parent?.RemoveChild(_gui);
-                    break;
-            }
-        }
-
-        public override void HandleNetworkMessage(ComponentMessage message, INetChannel netChannel, ICommonSession? session = null)
-        {
-            base.HandleNetworkMessage(message, netChannel, session);
-
-            switch (message)
-            {
-                case SuspicionAlliesMessage msg:
-                    Allies.Clear();
-                    Allies.UnionWith(msg.Allies.Select(_entityManager.GetEntity));
+                    RemoveTraitorOverlay();
                     break;
             }
         }
@@ -104,6 +140,7 @@ namespace Content.Client.GameObjects.Components.Suspicion
             base.OnRemove();
 
             _gui?.Dispose();
+            RemoveTraitorOverlay();
         }
     }
 }

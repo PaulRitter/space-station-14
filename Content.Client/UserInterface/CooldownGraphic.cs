@@ -1,6 +1,5 @@
 ﻿using System;
-using Robust.Client.Graphics.Drawing;
-using Robust.Client.Graphics.Shaders;
+using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Shared.IoC;
 using Robust.Shared.Maths;
@@ -14,7 +13,7 @@ namespace Content.Client.UserInterface
 
         [Dependency] private readonly IPrototypeManager _protoMan = default!;
 
-        private ShaderInstance _shader;
+        private readonly ShaderInstance _shader;
 
         public CooldownGraphic()
         {
@@ -30,7 +29,7 @@ namespace Content.Client.UserInterface
 
         protected override void Draw(DrawingHandleScreen handle)
         {
-            Span<float> x = stackalloc float[10];
+            Span<float> x = new float[10];
             Color color;
 
             var lerp = 1f - MathF.Abs(Progress); // for future bikeshedding purposes

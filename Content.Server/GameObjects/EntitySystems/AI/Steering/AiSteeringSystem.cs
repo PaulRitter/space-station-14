@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,16 +7,13 @@ using Content.Server.GameObjects.Components.Movement;
 using Content.Server.GameObjects.EntitySystems.AI.Pathfinding;
 using Content.Server.GameObjects.EntitySystems.AI.Pathfinding.Pathfinders;
 using Content.Server.GameObjects.EntitySystems.JobQueues;
-using Content.Shared.GameObjects.EntitySystems;
+using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.Utility;
-using Robust.Server.Interfaces.Timing;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
+using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using Robust.Shared.ViewVariables;
 
@@ -27,7 +24,6 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
         // http://www.red3d.com/cwr/papers/1999/gdc99steer.html for a steering overview
         [Dependency] private readonly IMapManager _mapManager = default!;
         [Dependency] private readonly IPauseManager _pauseManager = default!;
-        [Dependency] private readonly IEntityManager _entityManager = default!;
 
         private PathfindingSystem _pathfindingSystem;
 
@@ -53,37 +49,37 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
         // agent's steering. Should help a lot given this is the most expensive operator by far.
         // The AI will keep moving, it's just it'll keep moving in its existing direction.
         // If we change to 20/30 TPS you might want to change this but for now it's fine
-        private readonly List<Dictionary<IEntity, IAiSteeringRequest>> _agentLists = new List<Dictionary<IEntity, IAiSteeringRequest>>(AgentListCount);
+        private readonly List<Dictionary<IEntity, IAiSteeringRequest>> _agentLists = new(AgentListCount);
         private const int AgentListCount = 2;
         private int _listIndex;
 
         // Cache nextGrid
-        private readonly Dictionary<IEntity, EntityCoordinates> _nextGrid = new Dictionary<IEntity, EntityCoordinates>();
+        private readonly Dictionary<IEntity, EntityCoordinates> _nextGrid = new();
 
         /// <summary>
         /// Current live paths for AI
         /// </summary>
-        private readonly Dictionary<IEntity, Queue<TileRef>> _paths = new Dictionary<IEntity, Queue<TileRef>>();
+        private readonly Dictionary<IEntity, Queue<TileRef>> _paths = new();
 
         /// <summary>
         /// Pathfinding request jobs we're waiting on
         /// </summary>
         private readonly Dictionary<IEntity, (CancellationTokenSource CancelToken, Job<Queue<TileRef>> Job)> _pathfindingRequests =
-            new Dictionary<IEntity, (CancellationTokenSource, Job<Queue<TileRef>>)>();
+            new();
 
         /// <summary>
         /// Keep track of how long we've been in 1 position and re-path if it's been too long
         /// </summary>
-        private readonly Dictionary<IEntity, int> _stuckCounter = new Dictionary<IEntity, int>();
+        private readonly Dictionary<IEntity, int> _stuckCounter = new();
 
         /// <summary>
         /// Get a fixed position for the target entity; if they move then re-path
         /// </summary>
-        private readonly Dictionary<IEntity, EntityCoordinates> _entityTargetPosition = new Dictionary<IEntity, EntityCoordinates>();
+        private readonly Dictionary<IEntity, EntityCoordinates> _entityTargetPosition = new();
 
         // Anti-Stuck
         // Given the collision avoidance can lead to twitching need to store a reference position and check if we've been near this too long
-        private readonly Dictionary<IEntity, EntityCoordinates> _stuckPositions = new Dictionary<IEntity, EntityCoordinates>();
+        private readonly Dictionary<IEntity, EntityCoordinates> _stuckPositions = new();
 
         public override void Initialize()
         {
@@ -269,7 +265,7 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
 
             // Validation
             // Check if we can even arrive -> Currently only samegrid movement supported
-            if (entity.Transform.GridID != steeringRequest.TargetGrid.GetGridId(_entityManager))
+            if (entity.Transform.GridID != steeringRequest.TargetGrid.GetGridId(EntityManager))
             {
                 controller.VelocityDir = Vector2.Zero;
                 return SteeringStatus.NoPath;
@@ -417,9 +413,9 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
             var startTile = gridManager.GetTileRef(entity.Transform.Coordinates);
             var endTile = gridManager.GetTileRef(steeringRequest.TargetGrid);
             var collisionMask = 0;
-            if (entity.TryGetComponent(out ICollidableComponent collidableComponent))
+            if (entity.TryGetComponent(out IPhysicsComponent physics))
             {
-                collisionMask = collidableComponent.CollisionMask;
+                collisionMask = physics.CollisionMask;
             }
 
             var access = AccessReader.FindAccessTags(entity);
@@ -603,10 +599,10 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
                 return Vector2.Zero;
             }
 
-            if (target.TryGetComponent(out ICollidableComponent physicsComponent))
+            if (target.TryGetComponent(out IPhysicsComponent physics))
             {
                 var targetDistance = (targetPos.Position - entityPos.Position);
-                targetPos = targetPos.Offset(physicsComponent.LinearVelocity * targetDistance);
+                targetPos = targetPos.Offset(physics.LinearVelocity * targetDistance);
             }
 
             return (targetPos.Position - entityPos.Position).Normalized;
@@ -621,7 +617,7 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
         /// <returns></returns>
         private Vector2 CollisionAvoidance(IEntity entity, Vector2 direction, ICollection<IEntity> ignoredTargets)
         {
-            if (direction == Vector2.Zero || !entity.TryGetComponent(out ICollidableComponent collidableComponent))
+            if (direction == Vector2.Zero || !entity.TryGetComponent(out IPhysicsComponent physics))
             {
                 return Vector2.Zero;
             }
@@ -629,7 +625,7 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
             // We'll check tile-by-tile
             // Rewriting this frequently so not many comments as they'll go stale
             // I realise this is bad so please rewrite it ;-;
-            var entityCollisionMask = collidableComponent.CollisionMask;
+            var entityCollisionMask = physics.CollisionMask;
             var avoidanceVector = Vector2.Zero;
             var checkTiles = new HashSet<TileRef>();
             var avoidTiles = new HashSet<TileRef>();
@@ -662,8 +658,8 @@ namespace Content.Server.GameObjects.EntitySystems.AI.Steering
                     // if we're moving in the same direction then ignore
                     // So if 2 entities are moving towards each other and both detect a collision they'll both move in the same direction
                     // i.e. towards the right
-                    if (physicsEntity.TryGetComponent(out ICollidableComponent physicsComponent) &&
-                        Vector2.Dot(physicsComponent.LinearVelocity, direction) > 0)
+                    if (physicsEntity.TryGetComponent(out IPhysicsComponent otherPhysics) &&
+                        Vector2.Dot(otherPhysics.LinearVelocity, direction) > 0)
                     {
                         continue;
                     }

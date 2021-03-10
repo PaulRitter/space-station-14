@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 using NUnit.Framework;
-using Robust.Server.Interfaces.Maps;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
-using Robust.Shared.Interfaces.Resources;
+using Robust.Server.Maps;
+using Robust.Shared.ContentPack;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
@@ -37,13 +36,13 @@ namespace Content.IntegrationTests.Tests
                     var mapGrid = mapManager.CreateGrid(mapId);
                     var mapGridEnt = entityManager.GetEntity(mapGrid.GridEntityId);
                     mapGridEnt.Transform.WorldPosition = new Vector2(10, 10);
-                    mapGrid.SetTile(new MapIndices(0,0), new Tile(1, 512));
+                    mapGrid.SetTile(new Vector2i(0,0), new Tile(1, 512));
                 }
                 {
                     var mapGrid = mapManager.CreateGrid(mapId);
                     var mapGridEnt = entityManager.GetEntity(mapGrid.GridEntityId);
                     mapGridEnt.Transform.WorldPosition = new Vector2(-8, -8);
-                    mapGrid.SetTile(new MapIndices(0, 0), new Tile(2, 511));
+                    mapGrid.SetTile(new Vector2i(0, 0), new Tile(2, 511));
                 }
 
                 mapLoader.SaveMap(mapId, mapPath);
@@ -63,14 +62,14 @@ namespace Content.IntegrationTests.Tests
                     Assert.Fail();
 
                 Assert.That(mapGrid.WorldPosition, Is.EqualTo(new Vector2(10, 10)));
-                Assert.That(mapGrid.GetTileRef(new MapIndices(0, 0)).Tile, Is.EqualTo(new Tile(1, 512)));
+                Assert.That(mapGrid.GetTileRef(new Vector2i(0, 0)).Tile, Is.EqualTo(new Tile(1, 512)));
             }
             {
                 if (!mapManager.TryFindGridAt(new MapId(10), new Vector2(-8, -8), out var mapGrid))
                     Assert.Fail();
 
                 Assert.That(mapGrid.WorldPosition, Is.EqualTo(new Vector2(-8, -8)));
-                Assert.That(mapGrid.GetTileRef(new MapIndices(0, 0)).Tile, Is.EqualTo(new Tile(2, 511)));
+                Assert.That(mapGrid.GetTileRef(new Vector2i(0, 0)).Tile, Is.EqualTo(new Tile(2, 511)));
             }
 
         }

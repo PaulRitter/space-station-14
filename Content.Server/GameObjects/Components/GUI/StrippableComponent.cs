@@ -6,16 +6,13 @@ using Content.Server.GameObjects.Components.Items.Storage;
 using Content.Server.GameObjects.EntitySystems.DoAfter;
 using Content.Server.Utility;
 using Content.Shared.GameObjects.Components.GUI;
-using Content.Shared.GameObjects.EntitySystems;
+using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
-using Robust.Server.GameObjects.Components.UserInterface;
-using Robust.Server.Interfaces.GameObjects;
-using Robust.Server.Interfaces.Player;
+using Robust.Server.GameObjects;
+using Robust.Server.Player;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Localization;
 using Robust.Shared.ViewVariables;
 using static Content.Shared.GameObjects.Components.Inventory.EquipmentSlotDefines;
@@ -23,7 +20,8 @@ using static Content.Shared.GameObjects.Components.Inventory.EquipmentSlotDefine
 namespace Content.Server.GameObjects.Components.GUI
 {
     [RegisterComponent]
-    public sealed class StrippableComponent : SharedStrippableComponent, IDragDrop
+    [ComponentReference(typeof(SharedStrippableComponent))]
+    public sealed class StrippableComponent : SharedStrippableComponent
     {
         public const float StripDelay = 2f;
 
@@ -39,14 +37,15 @@ namespace Content.Server.GameObjects.Components.GUI
                 UserInterface.OnReceiveMessage += HandleUserInterfaceMessage;
             }
 
-            Owner.EnsureComponent<InventoryComponent>();
-            Owner.EnsureComponent<HandsComponent>();
-            Owner.EnsureComponent<CuffableComponent>();
+            Owner.EnsureComponentWarn<InventoryComponent>();
+            Owner.EnsureComponentWarn<HandsComponent>();
+            Owner.EnsureComponentWarn<CuffableComponent>();
 
             if (Owner.TryGetComponent(out CuffableComponent? cuffed))
             {
                 cuffed.OnCuffedStateChanged += UpdateSubscribed;
             }
+
             if (Owner.TryGetComponent(out InventoryComponent? inventory))
             {
                 inventory.OnItemChanged += UpdateSubscribed;
@@ -75,23 +74,14 @@ namespace Content.Server.GameObjects.Components.GUI
             UserInterface.SetState(new StrippingBoundUserInterfaceState(inventory, hands, cuffs));
         }
 
-        public bool CanBeStripped(IEntity by)
+        public override bool Drop(DragDropEventArgs args)
         {
-            return by != Owner
-                   && by.HasComponent<HandsComponent>()
-                   && ActionBlockerSystem.CanInteract(by);
-        }
+            if (args.User == null)
+            {
+                return false;
+            }
 
-        public bool CanDragDrop(DragDropEventArgs eventArgs)
-        {
-            return eventArgs.Target != eventArgs.Dropped
-                   && eventArgs.Target == eventArgs.User
-                   && CanBeStripped(eventArgs.User);
-        }
-
-        public bool DragDrop(DragDropEventArgs eventArgs)
-        {
-            if (!eventArgs.User.TryGetComponent(out IActorComponent? actor)) return false;
+            if (!args.User.TryGetComponent(out IActorComponent? actor)) return false;
 
             OpenUserInterface(actor.playerSession);
             return true;

@@ -1,20 +1,18 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Content.Client.Utility;
 using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Utility;
 using NUnit.Framework;
-using Robust.Server.GameObjects.Components.Container;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.GameObjects.Components;
-using Robust.Shared.Interfaces.Map;
+using Robust.Shared.Containers;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 
 namespace Content.IntegrationTests.Tests.Interaction
 {
     [TestFixture]
     [TestOf(typeof(SharedInteractionSystem))]
-    [TestOf(typeof(SharedRangeExtensions))]
-    [TestOf(typeof(RangeExtensions))]
+    [TestOf(typeof(SharedUnobstructedExtensions))]
+    [TestOf(typeof(UnobstructedExtensions))]
     public class InRangeUnobstructed : ContentIntegrationTest
     {
         private const string HumanId = "BaseHumanMob_Content";
@@ -51,7 +49,7 @@ namespace Content.IntegrationTests.Tests.Interaction
 
                 origin = entityManager.SpawnEntity(HumanId, coordinates);
                 other = entityManager.SpawnEntity(HumanId, coordinates);
-                container = ContainerManagerComponent.Ensure<Container>("InRangeUnobstructedTestOtherContainer", other);
+                container = ContainerHelpers.EnsureContainer<Container>(other, "InRangeUnobstructedTestOtherContainer");
                 component = other.Transform;
                 entityCoordinates = other.Transform.Coordinates;
                 mapCoordinates = other.Transform.MapPosition;

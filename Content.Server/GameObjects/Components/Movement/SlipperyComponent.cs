@@ -1,9 +1,9 @@
 ﻿using Content.Shared.Audio;
 using Content.Shared.GameObjects.Components.Movement;
-using Robust.Server.GameObjects.EntitySystems;
+using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Serialization;
+using Robust.Shared.Players;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Movement
@@ -22,6 +22,7 @@ namespace Content.Server.GameObjects.Components.Movement
         ///     Path to the sound to be played when a mob slips.
         /// </summary>
         [ViewVariables]
+        [DataField("slipSound")]
         private string SlipSound { get; set; } = "/Audio/Effects/slip.ogg";
 
         /// <summary>
@@ -87,13 +88,6 @@ namespace Content.Server.GameObjects.Components.Movement
             set => _launchForwardsMultiplier = value;
         }
 
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataField(this, x => SlipSound, "slipSound", "/Audio/Effects/slip.ogg");
-        }
-
         protected override void OnSlip()
         {
             if (!string.IsNullOrEmpty(SlipSound))
@@ -103,7 +97,7 @@ namespace Content.Server.GameObjects.Components.Movement
             }
         }
 
-        public override ComponentState GetComponentState()
+        public override ComponentState GetComponentState(ICommonSession player)
         {
             return new SlipperyComponentState(_paralyzeTime, _intersectPercentage, _requiredSlipSpeed, _launchForwardsMultiplier, _slippery);
         }

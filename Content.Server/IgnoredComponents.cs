@@ -1,17 +1,14 @@
-﻿namespace Content.Server
+// ReSharper disable ArrangeTrailingCommaInMultilineLists
+namespace Content.Server
 {
-
     public static class IgnoredComponents
     {
-
         public static string[] List => new [] {
             "ConstructionGhost",
             "IconSmooth",
             "SubFloorHide",
             "LowWall",
             "ReinforcedWall",
-            "Window",
-            "CharacterInfo",
             "InteractionOutline",
             "MeleeWeaponArcAnimation",
             "AnimationsTest",
@@ -19,8 +16,8 @@
             "Marker",
             "Clickable",
             "RadiatingLight",
+            "Icon",
+            "ClientEntitySpawner",
         };
-
     }
-
 }

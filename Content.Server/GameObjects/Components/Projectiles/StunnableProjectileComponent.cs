@@ -1,9 +1,6 @@
 using Content.Server.GameObjects.Components.Mobs;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Log;
-using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.GameObjects.Components.Projectiles
 {
@@ -16,27 +13,18 @@ namespace Content.Server.GameObjects.Components.Projectiles
         public override string Name => "StunnableProjectile";
 
         // See stunnable for what these do
-        private int _stunAmount;
-        private int _knockdownAmount;
-        private int _slowdownAmount;
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _stunAmount, "stunAmount", 0);
-            serializer.DataField(ref _knockdownAmount, "knockdownAmount", 0);
-            serializer.DataField(ref _slowdownAmount, "slowdownAmount", 0);
-        }
+        [DataField("stunAmount")]
+        private int _stunAmount = default;
+        [DataField("knockdownAmount")]
+        private int _knockdownAmount = default;
+        [DataField("slowdownAmount")]
+        private int _slowdownAmount = default;
 
         public override void Initialize()
         {
             base.Initialize();
 
-            if (!Owner.EnsureComponent(out ProjectileComponent _))
-            {
-                Logger.Warning(
-                    $"Entity {Owner.Name} at {Owner.Transform.MapPosition} didn't have a {nameof(ProjectileComponent)}");
-            }
+            Owner.EnsureComponentWarn(out ProjectileComponent _);
         }
 
         void ICollideBehavior.CollideWith(IEntity entity)

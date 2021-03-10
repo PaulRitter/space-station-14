@@ -1,11 +1,13 @@
-﻿using Content.Shared.GameObjects.EntitySystems;
+﻿using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.GameObjects.Verbs;
+using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Localization;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Server.GameObjects.Components.MachineLinking
 {
@@ -14,6 +16,7 @@ namespace Content.Server.GameObjects.Components.MachineLinking
     {
         public override string Name => "SignalSwitch";
 
+        [DataField("on")]
         private bool _on;
 
         public override void Initialize()
@@ -23,19 +26,12 @@ namespace Content.Server.GameObjects.Components.MachineLinking
             UpdateSprite();
         }
 
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataField(ref _on, "on", true);
-        }
-
-        public void Activate(ActivateEventArgs eventArgs)
+        void IActivate.Activate(ActivateEventArgs eventArgs)
         {
             TransmitSignal(eventArgs.User);
         }
 
-        public bool InteractHand(InteractHandEventArgs eventArgs)
+        bool IInteractHand.InteractHand(InteractHandEventArgs eventArgs)
         {
             TransmitSignal(eventArgs.User);
             return true;
@@ -52,7 +48,10 @@ namespace Content.Server.GameObjects.Components.MachineLinking
                 return;
             }
 
-            transmitter.TransmitSignal(user, _on ? SignalState.On : SignalState.Off);
+            if (!transmitter.TransmitSignal(_on))
+            {
+                Owner.PopupMessage(user, Loc.GetString("No receivers connected."));
+            }
         }
 
         private void UpdateSprite()

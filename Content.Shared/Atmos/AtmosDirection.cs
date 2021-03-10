@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+using System;
+using System.Runtime.CompilerServices;
 using Robust.Shared.Maths;
 using Robust.Shared.Serialization;
 
@@ -11,18 +13,18 @@ namespace Content.Shared.Atmos
     [FlagsFor(typeof(AtmosDirectionFlags))]
     public enum AtmosDirection
     {
-        Invalid = 0,
-        North   = 1 << 0,
-        South   = 1 << 1,
-        East    = 1 << 2,
-        West    = 1 << 3,
+        Invalid = 0,                        // 0
+        North   = 1 << 0,                   // 1
+        South   = 1 << 1,                   // 2
+        East    = 1 << 2,                   // 4
+        West    = 1 << 3,                   // 8
 
-        NorthEast = North | East,
-        NorthWest = North | West,
-        SouthEast = South | East,
-        SouthWest = South | West,
+        NorthEast = North | East,           // 5
+        SouthEast = South | East,           // 6
+        NorthWest = North | West,           // 9
+        SouthWest = South | West,           // 10
 
-        All = North | South | East | West,
+        All = North | South | East | West,  // 15
     }
 
     public static class AtmosDirectionHelpers
@@ -86,15 +88,15 @@ namespace Content.Shared.Atmos
         {
             return direction switch
             {
-                AtmosDirection.East => Angle.FromDegrees(0),
-                AtmosDirection.North => Angle.FromDegrees(90),
-                AtmosDirection.West => Angle.FromDegrees(180),
-                AtmosDirection.South => Angle.FromDegrees(270),
+                AtmosDirection.East => Angle.FromDegrees(90),
+                AtmosDirection.North => Angle.FromDegrees(180),
+                AtmosDirection.West => Angle.FromDegrees(-90),
+                AtmosDirection.South => Angle.FromDegrees(0),
 
-                AtmosDirection.NorthEast => Angle.FromDegrees(45),
-                AtmosDirection.NorthWest => Angle.FromDegrees(135),
-                AtmosDirection.SouthWest => Angle.FromDegrees(225),
-                AtmosDirection.SouthEast => Angle.FromDegrees(315),
+                AtmosDirection.NorthEast => Angle.FromDegrees(135),
+                AtmosDirection.NorthWest => Angle.FromDegrees(-135),
+                AtmosDirection.SouthWest => Angle.FromDegrees(-45),
+                AtmosDirection.SouthEast => Angle.FromDegrees(45),
 
                 _ => throw new ArgumentOutOfRangeException(nameof(direction), $"It was {direction}."),
             };
@@ -134,6 +136,12 @@ namespace Content.Shared.Atmos
         public static AtmosDirection WithoutFlag(this AtmosDirection direction, AtmosDirection other)
         {
             return direction & ~other;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsFlagSet(this AtmosDirection direction, AtmosDirection other)
+        {
+            return (direction & other) == other;
         }
     }
 

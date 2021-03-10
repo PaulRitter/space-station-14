@@ -1,7 +1,10 @@
-﻿using System;
+#nullable enable
+using System;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Power
@@ -11,22 +14,31 @@ namespace Content.Server.GameObjects.Components.Power
     {
         public override string Name => "Battery";
 
+        /// <summary>
+        /// Maximum charge of the battery in joules (ie. watt seconds)
+        /// </summary>
         [ViewVariables(VVAccess.ReadWrite)] public int MaxCharge { get => _maxCharge; set => SetMaxCharge(value); }
-        private int _maxCharge;
+        [DataField("maxCharge")]
+        private int _maxCharge = 1000;
 
+        /// <summary>
+        /// Current charge of the battery in joules (ie. watt seconds)
+        /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
         public float CurrentCharge { get => _currentCharge; set => SetCurrentCharge(value); }
+        [DataField("startingCharge")]
+        private float _currentCharge = 500;
 
-        private float _currentCharge;
+        /// <summary>
+        /// True if the battery is fully charged.
+        /// </summary>
+        [ViewVariables] public bool IsFullyCharged => MathHelper.CloseTo(CurrentCharge, MaxCharge);
+
+        [ViewVariables(VVAccess.ReadWrite)] [DataField("autoRecharge")] public bool AutoRecharge { get; set; }
+
+        [ViewVariables(VVAccess.ReadWrite)] [DataField("autoRechargeRate")] public float AutoRechargeRate { get; set; }
 
         [ViewVariables] public BatteryState BatteryState { get; private set; }
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _maxCharge, "maxCharge", 1000);
-            serializer.DataField(ref _currentCharge, "startingCharge", 500);
-        }
 
         public override void Initialize()
         {
@@ -37,7 +49,7 @@ namespace Content.Server.GameObjects.Components.Power
         /// <summary>
         ///     If sufficient charge is avaiable on the battery, use it. Otherwise, don't.
         /// </summary>
-        public bool TryUseCharge(float chargeToUse)
+        public virtual bool TryUseCharge(float chargeToUse)
         {
             if (chargeToUse >= CurrentCharge)
             {
@@ -50,7 +62,7 @@ namespace Content.Server.GameObjects.Components.Power
             }
         }
 
-        public float UseCharge(float toDeduct)
+        public virtual float UseCharge(float toDeduct)
         {
             var chargeChangedBy = Math.Min(CurrentCharge, toDeduct);
             CurrentCharge -= chargeChangedBy;
@@ -75,7 +87,7 @@ namespace Content.Server.GameObjects.Components.Power
 
         private void UpdateStorageState()
         {
-            if (CurrentCharge == MaxCharge)
+            if (IsFullyCharged)
             {
                 BatteryState = BatteryState.Full;
             }
@@ -102,6 +114,13 @@ namespace Content.Server.GameObjects.Components.Power
             _currentCharge = MathHelper.Clamp(newChargeAmount, 0, MaxCharge);
             UpdateStorageState();
             OnChargeChanged();
+        }
+
+        public void OnUpdate(float frameTime)
+        {
+            if (!AutoRecharge) return;
+            if (IsFullyCharged) return;
+            CurrentCharge += AutoRechargeRate * frameTime;
         }
     }
 

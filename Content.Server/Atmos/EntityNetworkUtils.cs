@@ -1,5 +1,4 @@
 using System;
-using Robust.Shared.Map;
 using Robust.Shared.Maths;
 
 namespace Content.Server.Atmos
@@ -23,9 +22,9 @@ namespace Content.Server.Atmos
             }
         }
 
-        public static MapIndices Offset(this MapIndices pos, Direction dir)
+        public static Vector2i Offset(this Vector2i pos, Direction dir)
         {
-            return pos + (MapIndices) dir.CardinalToIntVec();
+            return pos + (Vector2i) dir.CardinalToIntVec();
         }
     }
 }

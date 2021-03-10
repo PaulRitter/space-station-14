@@ -5,8 +5,7 @@ using Content.Server.GameObjects.Components.Atmos.Piping;
 using Content.Server.GameObjects.Components.NodeContainer.NodeGroups;
 using Content.Shared.Atmos;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components.Map;
-using Robust.Shared.Map;
+using Robust.Shared.Maths;
 
 namespace Content.Server.GameObjects.Components.Atmos
 {
@@ -18,7 +17,7 @@ namespace Content.Server.GameObjects.Components.Atmos
     {
         public override string Name => "UnsimulatedGridAtmosphere";
 
-        public override void PryTile(MapIndices indices) { }
+        public override void PryTile(Vector2i indices) { }
 
         public override void RepopulateTiles()
         {
@@ -31,15 +30,15 @@ namespace Content.Server.GameObjects.Components.Atmos
             }
         }
 
-        public override void Invalidate(MapIndices indices) { }
+        public override void Invalidate(Vector2i indices) { }
 
         protected override void Revalidate() { }
 
-        public override void FixVacuum(MapIndices indices) { }
+        public override void FixVacuum(Vector2i indices) { }
 
         public override void AddActiveTile(TileAtmosphere? tile) { }
 
-        public override void RemoveActiveTile(TileAtmosphere? tile) { }
+        public override void RemoveActiveTile(TileAtmosphere? tile, bool disposeGroup = true) { }
 
         public override void AddHotspotTile(TileAtmosphere? tile) { }
 
@@ -70,42 +69,42 @@ namespace Content.Server.GameObjects.Components.Atmos
 
         public override void Update(float frameTime) { }
 
-        public override bool ProcessTileEqualize(bool resumed = false)
+        public override bool ProcessTileEqualize(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        public override bool ProcessActiveTiles(bool resumed = false)
+        public override bool ProcessActiveTiles(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        public override bool ProcessExcitedGroups(bool resumed = false)
+        public override bool ProcessExcitedGroups(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        public override bool ProcessHighPressureDelta(bool resumed = false)
+        public override bool ProcessHighPressureDelta(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        protected override bool ProcessHotspots(bool resumed = false)
+        protected override bool ProcessHotspots(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        protected override bool ProcessSuperconductivity(bool resumed = false)
+        protected override bool ProcessSuperconductivity(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        protected override bool ProcessPipeNets(bool resumed = false)
+        protected override bool ProcessPipeNets(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }
 
-        protected override bool ProcessPipeNetDevices(bool resumed = false)
+        protected override bool ProcessPipeNetDevices(bool resumed = false, float lagCheck = 5f)
         {
             return false;
         }

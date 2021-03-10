@@ -1,19 +1,18 @@
 ﻿#nullable enable
 using Content.Server.GameObjects.Components.Buckle;
 using Content.Server.GameObjects.Components.Mobs;
-using Content.Shared.GameObjects.Components.Mobs;
+using Content.Shared.Alert;
 using Content.Shared.GameObjects.Components.Movement;
 using Content.Shared.GameObjects.Components.Strap;
 using Content.Shared.Physics;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
 using Robust.Shared.IoC;
 using Robust.Shared.Log;
 using Robust.Shared.Map;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Movement
@@ -23,7 +22,6 @@ namespace Content.Server.GameObjects.Components.Movement
     internal class ShuttleControllerComponent : Component, IMoverComponent
     {
         [Dependency] private readonly IMapManager _mapManager = default!;
-        [Dependency] private readonly IEntityManager _entityManager = default!;
 
         private bool _movingUp;
         private bool _movingDown;
@@ -31,9 +29,10 @@ namespace Content.Server.GameObjects.Components.Movement
         private bool _movingRight;
 
         /// <summary>
-        ///     The icon to be displayed when piloting from this chair.
+        ///     ID of the alert to show when piloting
         /// </summary>
-        private string _pilotingIcon = default!;
+        [DataField("pilotingAlertType")]
+        private AlertType _pilotingAlertType = AlertType.PilotingShuttle;
 
         /// <summary>
         ///     The entity that's currently controlling this component.
@@ -66,18 +65,18 @@ namespace Content.Server.GameObjects.Components.Movement
             var gridId = Owner.Transform.GridID;
 
             if (_mapManager.TryGetGrid(gridId, out var grid) &&
-                _entityManager.TryGetEntity(grid.GridEntityId, out var gridEntity))
+                Owner.EntityManager.TryGetEntity(grid.GridEntityId, out var gridEntity))
             {
                 //TODO: Switch to shuttle component
-                if (!gridEntity.TryGetComponent(out ICollidableComponent? collidable))
+                if (!gridEntity.TryGetComponent(out IPhysicsComponent? physics))
                 {
-                    collidable = gridEntity.AddComponent<CollidableComponent>();
-                    collidable.Mass = 1;
-                    collidable.CanCollide = true;
-                    collidable.PhysicsShapes.Add(new PhysShapeGrid(grid));
+                    physics = gridEntity.AddComponent<PhysicsComponent>();
+                    physics.Mass = 1;
+                    physics.CanCollide = true;
+                    physics.PhysicsShapes.Add(new PhysShapeGrid(grid));
                 }
 
-                var controller = collidable.EnsureController<ShuttleController>();
+                var controller = physics.EnsureController<ShuttleController>();
                 controller.Push(CalcNewVelocity(direction, enabled), CurrentWalkSpeed);
             }
         }
@@ -137,7 +136,7 @@ namespace Content.Server.GameObjects.Components.Movement
             if (_controller != null ||
                 !entity.TryGetComponent(out MindComponent? mind) ||
                 mind.Mind == null ||
-                !Owner.TryGetComponent(out ServerStatusEffectsComponent? status))
+                !Owner.TryGetComponent(out ServerAlertsComponent? status))
             {
                 return;
             }
@@ -145,7 +144,7 @@ namespace Content.Server.GameObjects.Components.Movement
             mind.Mind.Visit(Owner);
             _controller = entity;
 
-            status.ChangeStatusEffectIcon(StatusEffect.Piloting, _pilotingIcon);
+            status.ShowAlert(_pilotingAlertType);
         }
 
         /// <summary>
@@ -177,9 +176,9 @@ namespace Content.Server.GameObjects.Components.Movement
         /// <param name="entity">The entity to update</param>
         private void UpdateRemovedEntity(IEntity entity)
         {
-            if (Owner.TryGetComponent(out ServerStatusEffectsComponent? status))
+            if (Owner.TryGetComponent(out ServerAlertsComponent? status))
             {
-                status.RemoveStatusEffect(StatusEffect.Piloting);
+                status.ClearAlert(_pilotingAlertType);
             }
 
             if (entity.TryGetComponent(out MindComponent? mind))
@@ -207,17 +206,10 @@ namespace Content.Server.GameObjects.Components.Movement
             }
         }
 
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-
-            serializer.DataField(ref _pilotingIcon, "pilotingIcon", "/Textures/Interface/StatusEffects/Buckle/buckled.png");
-        }
-
         public override void Initialize()
         {
             base.Initialize();
-            Owner.EnsureComponent<ServerStatusEffectsComponent>();
+            Owner.EnsureComponent<ServerAlertsComponent>();
         }
 
         /// <inheritdoc />

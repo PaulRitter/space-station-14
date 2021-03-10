@@ -1,5 +1,5 @@
 ﻿#nullable enable
-using Robust.Shared.GameObjects.Components;
+using Robust.Shared.GameObjects;
 using Robust.Shared.Maths;
 using Robust.Shared.Physics;
 
@@ -7,7 +7,7 @@ namespace Content.Shared.Physics
 {
     public class ThrownController : VirtualController
     {
-        public override ICollidableComponent? ControlledComponent { protected get; set; }
+        public override IPhysicsComponent? ControlledComponent { protected get; set; }
 
         public void Push(Vector2 velocityDirection, float speed)
         {

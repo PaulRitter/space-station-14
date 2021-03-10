@@ -4,7 +4,7 @@ using Content.Shared.GameObjects.EntitySystems;
 using JetBrains.Annotations;
 using Robust.Client.Physics;
 using Robust.Client.Player;
-using Robust.Shared.GameObjects.Components;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 
 namespace Content.Client.GameObjects.EntitySystems
@@ -25,15 +25,14 @@ namespace Content.Client.GameObjects.EntitySystems
         {
             var playerEnt = _playerManager.LocalPlayer?.ControlledEntity;
 
-            if (playerEnt == null || !playerEnt.TryGetComponent(out IMoverComponent? mover))
+            if (playerEnt == null || !playerEnt.TryGetComponent(out IMoverComponent? mover) || !playerEnt.TryGetComponent(out IPhysicsComponent? physics))
             {
                 return;
             }
 
-            var collidable = playerEnt.GetComponent<ICollidableComponent>();
-            collidable.Predict = true;
+            physics.Predict = true;
 
-            UpdateKinematics(playerEnt.Transform, mover, collidable);
+            UpdateKinematics(playerEnt.Transform, mover, physics);
         }
 
         public override void Update(float frameTime)

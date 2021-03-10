@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Robust.Client.Graphics;
-using Robust.Client.Interfaces.ResourceManagement;
 using Robust.Client.ResourceManagement;
 using Robust.Client.Utility;
 using Robust.Shared.IoC;
@@ -22,10 +21,10 @@ namespace Content.Client
         [Dependency] private readonly IResourceCache _resourceCache = default!;
 
         [ViewVariables]
-        private readonly Dictionary<Texture, ClickMap> _textureMaps = new Dictionary<Texture, ClickMap>();
+        private readonly Dictionary<Texture, ClickMap> _textureMaps = new();
 
         [ViewVariables] private readonly Dictionary<RSI, RsiClickMapData> _rsiMaps =
-            new Dictionary<RSI, RsiClickMapData>();
+            new();
 
         public void PostInject()
         {
@@ -69,7 +68,18 @@ namespace Content.Client
                 return false;
             }
 
-            var offset = rsiData.Offsets[state][(int) dir][frame];
+            if (!rsiData.Offsets.TryGetValue(state, out var stateDat) || stateDat.Length <= (int) dir)
+            {
+                return false;
+            }
+
+            var dirDat = stateDat[(int) dir];
+            if (dirDat.Length <= frame)
+            {
+                return false;
+            }
+
+            var offset = dirDat[frame];
             return SampleClickMap(rsiData.ClickMap, pos, rsi.Size, offset);
         }
 

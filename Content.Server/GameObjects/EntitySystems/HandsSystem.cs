@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Content.Server.GameObjects.Components.GUI;
 using Content.Server.GameObjects.Components.Items.Storage;
@@ -10,16 +10,14 @@ using Content.Shared.GameObjects.EntitySystems;
 using Content.Shared.Input;
 using Content.Shared.Interfaces;
 using JetBrains.Annotations;
-using Robust.Server.GameObjects.EntitySystemMessages;
-using Robust.Server.Interfaces.Player;
+using Robust.Server.GameObjects;
+using Robust.Server.Player;
+using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
 using Robust.Shared.Input.Binding;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
-using Robust.Shared.IoC;
 using Robust.Shared.Localization;
 using Robust.Shared.Map;
+using Robust.Shared.Maths;
 using Robust.Shared.Players;
 using static Content.Shared.GameObjects.Components.Inventory.EquipmentSlotDefines;
 
@@ -28,7 +26,6 @@ namespace Content.Server.GameObjects.EntitySystems
     [UsedImplicitly]
     internal sealed class HandsSystem : EntitySystem
     {
-        [Dependency] private readonly IEntityManager _entityManager = default!;
 
         private const float ThrowForce = 1.5f; // Throwing force of mobs in Newtons
 
@@ -47,8 +44,6 @@ namespace Content.Server.GameObjects.EntitySystems
                 .Bind(ContentKeyFunctions.ThrowItemInHand, new PointerInputCmdHandler(HandleThrowItem))
                 .Bind(ContentKeyFunctions.SmartEquipBackpack, InputCmdHandler.FromDelegate(HandleSmartEquipBackpack))
                 .Bind(ContentKeyFunctions.SmartEquipBelt, InputCmdHandler.FromDelegate(HandleSmartEquipBelt))
-                .Bind(ContentKeyFunctions.MovePulledObject, new PointerInputCmdHandler(HandleMovePulledObject))
-                .Bind(ContentKeyFunctions.ReleasePulledObject, InputCmdHandler.FromDelegate(HandleReleasePulledObject))
                 .Register<HandsSystem>();
         }
 
@@ -119,16 +114,23 @@ namespace Content.Server.GameObjects.EntitySystems
             if (!ent.TryGetComponent(out HandsComponent handsComp))
                 return false;
 
-            if (handsComp.GetActiveHand == null)
+            if (handsComp.ActiveHand == null || handsComp.GetActiveHand == null)
                 return false;
 
-            var entCoords = ent.Transform.Coordinates.Position;
-            var entToDesiredDropCoords = coords.Position - entCoords;
-            var targetLength = Math.Min(entToDesiredDropCoords.Length, SharedInteractionSystem.InteractionRange - 0.001f); // InteractionRange is reduced due to InRange not dealing with floating point error
-            var newCoords = coords.WithPosition(entToDesiredDropCoords.Normalized * targetLength + entCoords).ToMap(_entityManager);
-            var rayLength = Get<SharedInteractionSystem>().UnobstructedDistance(ent.Transform.MapPosition, newCoords, ignoredEnt: ent);
+            var entMap = ent.Transform.MapPosition;
+            var targetPos = coords.ToMapPos(EntityManager);
+            var dropVector = targetPos - entMap.Position;
+            var targetVector = Vector2.Zero;
 
-            handsComp.Drop(handsComp.ActiveHand, coords.WithPosition(entCoords + entToDesiredDropCoords.Normalized * rayLength));
+            if (dropVector != Vector2.Zero)
+            {
+                var targetLength = MathF.Min(dropVector.Length, SharedInteractionSystem.InteractionRange - 0.001f); // InteractionRange is reduced due to InRange not dealing with floating point error
+                var newCoords = coords.WithPosition(dropVector.Normalized * targetLength + entMap.Position).ToMap(EntityManager);
+                var rayLength = Get<SharedInteractionSystem>().UnobstructedDistance(entMap, newCoords, ignoredEnt: ent);
+                targetVector = dropVector.Normalized * rayLength;
+            }
+
+            handsComp.Drop(handsComp.ActiveHand, coords.WithPosition(entMap.Position + targetVector));
 
             return true;
         }
@@ -174,7 +176,7 @@ namespace Content.Server.GameObjects.EntitySystems
                     newStackComp.Count = 1;
             }
 
-            ThrowHelper.ThrowTo(throwEnt, ThrowForce, coords, plyEnt.Transform.Coordinates, false, plyEnt);
+            throwEnt.ThrowTo(ThrowForce, coords, plyEnt.Transform.Coordinates, false, plyEnt);
 
             return true;
         }
@@ -212,7 +214,7 @@ namespace Content.Server.GameObjects.EntitySystems
 
             if (heldItem != null)
             {
-                storageComponent.PlayerInsertEntity(plyEnt);
+                storageComponent.PlayerInsertHeldEntity(plyEnt);
             }
             else
             {
@@ -229,29 +231,5 @@ namespace Content.Server.GameObjects.EntitySystems
                 }
             }
         }
-
-        private bool HandleMovePulledObject(ICommonSession session, EntityCoordinates coords, EntityUid uid)
-        {
-            var playerEntity = session.AttachedEntity;
-
-            if (playerEntity == null ||
-                !playerEntity.TryGetComponent<HandsComponent>(out var hands))
-            {
-                return false;
-            }
-
-            hands.MovePulledObject(playerEntity.Transform.Coordinates, coords);
-
-            return false;
-        }
-
-        private static void HandleReleasePulledObject(ICommonSession session)
-        {
-            if (!TryGetAttachedComponent(session as IPlayerSession, out HandsComponent handsComp))
-                return;
-                        
-            handsComp.StopPull();
-        }
-
     }
 }

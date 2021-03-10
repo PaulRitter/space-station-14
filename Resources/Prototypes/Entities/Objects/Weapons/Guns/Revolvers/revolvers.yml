@@ -9,7 +9,6 @@
     netsync: false
     state: icon
 
-
 - type: entity
   name: Deckard
   parent: RevolverBase
@@ -26,7 +25,6 @@
     - state: mag-unshaded-3
       map: ["enum.RangedBarrelVisualLayers.MagUnshaded"]
       shader: unshaded
-
   - type: Item
     size: 24
     sprite: Objects/Weapons/Guns/Revolvers/deckard.rsi
@@ -54,11 +52,10 @@
   name: Inspector
   parent: RevolverBase
   id: RevolverInspector
-  description: A rooty tooty point and shooty.
+  description: A high caliber revolver. Still quite deadly, despite its ancient design.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Revolvers/inspector.rsi
-
   - type: Item
     size: 24
     sprite: Objects/Weapons/Guns/Revolvers/inspector.rsi
@@ -79,11 +76,10 @@
   name: Mateba
   parent: RevolverBase
   id: RevolverMateba
-  description: A rooty tooty point and shooty.
+  description: The iconic sidearm of the dreaded death squads.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Revolvers/mateba.rsi
-
   - type: Item
     size: 24
     sprite: Objects/Weapons/Guns/Revolvers/mateba.rsi

@@ -1,5 +1,5 @@
-using Robust.Client.GameObjects.Components.UserInterface;
-using Robust.Shared.GameObjects.Components.UserInterface;
+﻿using Robust.Client.GameObjects;
+using Robust.Shared.GameObjects;
 using static Content.Shared.GameObjects.Components.SharedWiresComponent;
 
 namespace Content.Client.GameObjects.Components.Wires
@@ -35,8 +35,10 @@ namespace Content.Client.GameObjects.Components.Wires
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+            if (!disposing)
+                return;
 
-            _menu.Close();
+            _menu.Dispose();
         }
     }
 }

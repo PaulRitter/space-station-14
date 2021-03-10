@@ -1,5 +1,6 @@
 using System;
-using Content.Shared.GameObjects.EntitySystems;
+using System.Collections.Generic;
+using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization;
 
@@ -17,8 +18,6 @@ namespace Content.Shared.GameObjects.Components.Observer
         public bool CanPickup() => false;
         public bool CanEmote() => false;
         public bool CanAttack() => false;
-        public bool CanShiver() => false;
-        public bool CanSweat() => false;
     }
 
     [Serializable, NetSerializable]
@@ -35,7 +34,52 @@ namespace Content.Shared.GameObjects.Components.Observer
     [Serializable, NetSerializable]
     public class ReturnToBodyComponentMessage : ComponentMessage
     {
-        public ReturnToBodyComponentMessage() => Directed = true;
+        public ReturnToBodyComponentMessage()
+        {
+            Directed = true;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public class GhostRequestWarpPointData : ComponentMessage
+    {
+        public GhostRequestWarpPointData()
+        {
+            Directed = true;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public class GhostRequestPlayerNameData : ComponentMessage
+    {
+        public GhostRequestPlayerNameData()
+        {
+            Directed = true;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public class GhostReplyWarpPointData : ComponentMessage
+    {
+        public List<string> WarpName;
+
+        public GhostReplyWarpPointData(List<string> warpName)
+        {
+            WarpName = warpName;
+            Directed = true;
+        }
+    }
+
+    [Serializable, NetSerializable]
+    public class GhostReplyPlayerNameData : ComponentMessage
+    {
+        public Dictionary<EntityUid,string> PlayerNames;
+
+        public GhostReplyPlayerNameData(Dictionary<EntityUid, string> playerNameDict)
+        {
+            PlayerNames = playerNameDict;
+            Directed = true;
+        }
     }
 
 
@@ -45,3 +89,5 @@ namespace Content.Shared.GameObjects.Components.Observer
         public ReturnToCloneComponentMessage() => Directed = true;
     }
 }
+
+

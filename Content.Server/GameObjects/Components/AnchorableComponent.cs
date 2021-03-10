@@ -2,11 +2,12 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Interactable;
+using Content.Server.GameObjects.Components.Pulling;
+using Content.Server.Utility;
 using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.GameObjects;
+using Robust.Shared.Serialization.Manager.Attributes;
 using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components
@@ -17,7 +18,15 @@ namespace Content.Server.GameObjects.Components
         public override string Name => "Anchorable";
 
         [ViewVariables]
+        [DataField("tool")]
+        public ToolQuality Tool { get; private set; } = ToolQuality.Anchoring;
+
+        [ViewVariables]
         int IInteractUsing.Priority => 1;
+
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("snap")]
+        public bool Snap { get; private set; }
 
         /// <summary>
         ///     Checks if a tool can change the anchored status.
@@ -26,9 +35,9 @@ namespace Content.Server.GameObjects.Components
         /// <param name="utilizing">The tool being used, can be null if forcing it</param>
         /// <param name="force">Whether or not to check if the tool is valid</param>
         /// <returns>true if it is valid, false otherwise</returns>
-        private async Task<bool> Valid(IEntity user, IEntity? utilizing, [MaybeNullWhen(false)] bool force = false)
+        private async Task<bool> Valid(IEntity user, IEntity? utilizing, [NotNullWhen(true)] bool force = false)
         {
-            if (!Owner.HasComponent<ICollidableComponent>())
+            if (!Owner.HasComponent<IPhysicsComponent>())
             {
                 return false;
             }
@@ -37,7 +46,7 @@ namespace Content.Server.GameObjects.Components
             {
                 if (utilizing == null ||
                     !utilizing.TryGetComponent(out ToolComponent? tool) ||
-                    !(await tool.UseTool(user, Owner, 0.5f, ToolQuality.Anchoring)))
+                    !(await tool.UseTool(user, Owner, 0.5f, Tool)))
                 {
                     return false;
                 }
@@ -60,8 +69,19 @@ namespace Content.Server.GameObjects.Components
                 return false;
             }
 
-            var physics = Owner.GetComponent<ICollidableComponent>();
+            var physics = Owner.GetComponent<IPhysicsComponent>();
             physics.Anchored = true;
+
+            if (Owner.TryGetComponent(out PullableComponent? pullableComponent))
+            {
+                if (pullableComponent.Puller != null)
+                {
+                    pullableComponent.TryStopPull();
+                }
+            }
+
+            if (Snap)
+                Owner.SnapToGrid(SnapGridOffset.Center, Owner.EntityManager);
 
             return true;
         }
@@ -80,7 +100,7 @@ namespace Content.Server.GameObjects.Components
                 return false;
             }
 
-            var physics = Owner.GetComponent<ICollidableComponent>();
+            var physics = Owner.GetComponent<IPhysicsComponent>();
             physics.Anchored = false;
 
             return true;
@@ -95,12 +115,12 @@ namespace Content.Server.GameObjects.Components
         /// <returns>true if toggled, false otherwise</returns>
         private async Task<bool> TryToggleAnchor(IEntity user, IEntity? utilizing = null, bool force = false)
         {
-            if (!Owner.TryGetComponent(out ICollidableComponent? collidable))
+            if (!Owner.TryGetComponent(out IPhysicsComponent? physics))
             {
                 return false;
             }
 
-            return collidable.Anchored ?
+            return physics.Anchored ?
                 await TryUnAnchor(user, utilizing, force) :
                 await TryAnchor(user, utilizing, force);
         }
@@ -108,7 +128,7 @@ namespace Content.Server.GameObjects.Components
         public override void Initialize()
         {
             base.Initialize();
-            Owner.EnsureComponent<CollidableComponent>();
+            Owner.EnsureComponent<PhysicsComponent>();
         }
 
         async Task<bool> IInteractUsing.InteractUsing(InteractUsingEventArgs eventArgs)

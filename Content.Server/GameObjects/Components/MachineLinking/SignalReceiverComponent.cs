@@ -5,10 +5,11 @@ using Content.Shared.GameObjects.Components.Interactable;
 using Content.Shared.Interfaces;
 using Content.Shared.Interfaces.GameObjects.Components;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
-using Robust.Shared.IoC;
 using Robust.Shared.Localization;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
+using Robust.Shared.Utility;
 
 namespace Content.Server.GameObjects.Components.MachineLinking
 {
@@ -19,6 +20,9 @@ namespace Content.Server.GameObjects.Components.MachineLinking
 
         private List<SignalTransmitterComponent> _transmitters;
 
+        [DataField("maxTransmitters")]
+        private int? _maxTransmitters = default;
+
         public override void Initialize()
         {
             base.Initialize();
@@ -26,29 +30,46 @@ namespace Content.Server.GameObjects.Components.MachineLinking
             _transmitters = new List<SignalTransmitterComponent>();
         }
 
-        public void DistributeSignal(SignalState state)
+        public void DistributeSignal<T>(T state)
         {
-            foreach (var comp in Owner.GetAllComponents<ISignalReceiver>())
+            foreach (var comp in Owner.GetAllComponents<ISignalReceiver<T>>())
             {
                 comp.TriggerSignal(state);
             }
         }
 
-        public void Subscribe(SignalTransmitterComponent transmitter)
+        public bool Subscribe(SignalTransmitterComponent transmitter)
         {
             if (_transmitters.Contains(transmitter))
             {
-                return;
+                return true;
             }
+
+            if (_transmitters.Count >= _maxTransmitters) return false;
 
             transmitter.Subscribe(this);
             _transmitters.Add(transmitter);
+            return true;
         }
 
         public void Unsubscribe(SignalTransmitterComponent transmitter)
         {
             transmitter.Unsubscribe(this);
             _transmitters.Remove(transmitter);
+        }
+
+        public void UnsubscribeAll()
+        {
+            for (var i = _transmitters.Count-1; i >= 0; i--)
+            {
+                var transmitter = _transmitters[i];
+                if (transmitter.Deleted)
+                {
+                    continue;
+                }
+
+                transmitter.Unsubscribe(this);
+            }
         }
 
         /// <summary>
@@ -78,12 +99,16 @@ namespace Content.Server.GameObjects.Components.MachineLinking
                 return false;
             }
 
-            Subscribe(transmitter);
+            if (!Subscribe(transmitter))
+            {
+                Owner.PopupMessage(user, Loc.GetString("Max Transmitters reached!"));
+                return false;
+            }
             Owner.PopupMessage(user, Loc.GetString("Linked!"));
             return true;
         }
 
-        public async Task<bool> InteractUsing(InteractUsingEventArgs eventArgs)
+        async Task<bool> IInteractUsing.InteractUsing(InteractUsingEventArgs eventArgs)
         {
             if (!eventArgs.Using.TryGetComponent<ToolComponent>(out var tool))
                 return false;
@@ -101,15 +126,8 @@ namespace Content.Server.GameObjects.Components.MachineLinking
         {
             base.Shutdown();
 
-            foreach (var transmitter in _transmitters)
-            {
-                if (transmitter.Deleted)
-                {
-                    continue;
-                }
+            UnsubscribeAll();
 
-                transmitter.Unsubscribe(this);
-            }
             _transmitters.Clear();
         }
     }

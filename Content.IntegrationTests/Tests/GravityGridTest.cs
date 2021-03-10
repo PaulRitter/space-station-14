@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Content.Server.GameObjects.Components.Gravity;
 using Content.Server.GameObjects.Components.Power.ApcNetComponents;
+using Content.Shared.GameObjects.Components.Gravity;
 using Content.Shared.Utility;
 using NUnit.Framework;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.Map;
+using Robust.Shared.GameObjects;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
 
@@ -16,10 +16,19 @@ namespace Content.IntegrationTests.Tests
     [TestOf(typeof(GravityGeneratorComponent))]
     public class GravityGridTest : ContentIntegrationTest
     {
+        private const string Prototypes = @"
+- type: entity
+  name: GravityGeneratorDummy
+  id: GravityGeneratorDummy
+  components:
+  - type: GravityGenerator
+  - type: PowerReceiver
+";
         [Test]
         public async Task Test()
         {
-            var server = StartServerDummyTicker();
+            var options = new ServerIntegrationOptions{ExtraPrototypes = Prototypes};
+            var server = StartServerDummyTicker(options);
 
             IEntity generator = null;
 
@@ -37,7 +46,7 @@ namespace Content.IntegrationTests.Tests
 
                 var entityMan = IoCManager.Resolve<IEntityManager>();
 
-                generator = entityMan.SpawnEntity("GravityGenerator", grid2.ToCoordinates());
+                generator = entityMan.SpawnEntity("GravityGeneratorDummy", grid2.ToCoordinates());
                 Assert.That(generator.HasComponent<GravityGeneratorComponent>());
                 Assert.That(generator.HasComponent<PowerReceiverComponent>());
                 var generatorComponent = generator.GetComponent<GravityGeneratorComponent>();

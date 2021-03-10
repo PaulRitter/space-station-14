@@ -8,6 +8,8 @@
   - type: Sprite
     netsync: false
     state: icon
+  - type: Icon
+    state: icon
   - type: Item
     size: 24
   - type: PumpBarrel
@@ -28,9 +30,9 @@
 
 - type: entity
   name: Bojevic
-  parent: BaseItem
+  parent: ShotgunBase
   id: ShotgunBojevic
-  description: It's a magazine-fed shotgun designed for close quarters combat, nicknamed 'Striker' by boarding parties. A robust and reliable design allows you to swap magazines on the go and dump as many shells at your foes as you want... if you can manage the recoil, of course.
+  description: It's a magazine-fed shotgun designed for close quarters combat.
   components:
   - type: Sprite
     netsync: false
@@ -42,6 +44,8 @@
       map: ["enum.RangedBarrelVisualLayers.Bolt"]
     - state: mag-0
       map: ["enum.RangedBarrelVisualLayers.Mag"]
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Shotguns/bojevic.rsi
   - type: Item
     sprite: Objects/Weapons/Guns/Shotguns/bojevic.rsi
   - type: RangedWeapon
@@ -71,21 +75,23 @@
 
 - type: entity
   name: double-barreled shotgun
-  parent: BaseItem
+  parent: LauncherBase
   id: ShotgunDB
   description: An immortal classic.
   components:
   - type: Sprite
-    netsync: false
     sprite: Objects/Weapons/Guns/Shotguns/db_shotgun.rsi
     layers:
       - state: base
         map: ["enum.RangedBarrelVisualLayers.Base"]
       - state: bolt-closed
         map: ["enum.RangedBarrelVisualLayers.Bolt"]
-  - type: Item
+  - type: Icon
     sprite: Objects/Weapons/Guns/Shotguns/db_shotgun.rsi
     state: icon
+  - type: Item
+    size: 24
+    sprite: Objects/Weapons/Guns/Shotguns/db_shotgun.rsi
   - type: RangedWeapon
   - type: BoltActionBarrel
     caliber: Shotgun
@@ -93,8 +99,8 @@
     allSelectors:
     - Single
     fillPrototype: ShellShotgun
-    capacity: 2
     fireRate: 8.0
+    capacity: 2
     minAngle: 10
     maxAngle: 60
     angleIncrease: 30
@@ -103,8 +109,8 @@
     soundGunshot: /Audio/Weapons/Guns/Gunshots/shotgun.ogg
     soundEmpty: /Audio/Weapons/Guns/Empty/empty.ogg
     soundInsert: /Audio/Weapons/Guns/MagIn/shotgun_insert.ogg
-    sound_bolt_open: /Audio/Weapons/Guns/Cock/shotgun_open.ogg
-    sound_bolt_closed: /Audio/Weapons/Guns/Cock/shotgun_close.ogg
+    soundBoltOpen: /Audio/Weapons/Guns/Cock/shotgun_open.ogg
+    soundBoltClosed: /Audio/Weapons/Guns/Cock/shotgun_close.ogg
   - type: Appearance
     visuals:
     - type: BarrelBoltVisualizer
@@ -113,7 +119,7 @@
   name: Bull
   parent: ShotgunBase
   id: ShotgunBull
-  description: A Frozen Star pump-action shotgun. A marvel of engineering, this gun is often used by Ironhammer tactical units. Due to shorter than usual barrels, recoil kicks slightly harder.
+  description: A Frozen Star pump-action shotgun.
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/bull.rsi
@@ -123,6 +129,8 @@
       - state: mag-unshaded-1
         map: ["enum.RangedBarrelVisualLayers.MagUnshaded"]
         shader: unshaded
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Shotguns/bull.rsi
   - type: Item
     sprite: Objects/Weapons/Guns/Shotguns/bull.rsi
   - type: RangedWeapon
@@ -141,9 +149,11 @@
   name: Gladstone
   parent: ShotgunBase
   id: ShotgunGladstone
-  description: It is a next-generation Frozen Star shotgun intended as a cost-effective competitor to the aging NT "Regulator 1000". It has a semi-rifled lightweight full-length barrel which gives it exceptional accuracy with all types of ammunition, with a high-capacity magazine tube below it.
+  description: A next-generation Frozen Star shotgun.
   components:
   - type: Sprite
+    sprite: Objects/Weapons/Guns/Shotguns/gladstone.rsi
+  - type: Icon
     sprite: Objects/Weapons/Guns/Shotguns/gladstone.rsi
   - type: Item
     sprite: Objects/Weapons/Guns/Shotguns/gladstone.rsi
@@ -156,9 +166,11 @@
   name: Regulator 1000
   parent: ShotgunBase
   id: ShotgunRegulator
-  description: Designed for close quarters combat, the Regulator is widely regarded as a weapon of choice for repelling boarders. Some may say that it's too old, but it actually proved itself useful.
+  description: Ol' reliable.
   components:
   - type: Sprite
+    sprite: Objects/Weapons/Guns/Shotguns/regulator.rsi
+  - type: Icon
     sprite: Objects/Weapons/Guns/Shotguns/regulator.rsi
   - type: Item
     sprite: Objects/Weapons/Guns/Shotguns/regulator.rsi
@@ -175,6 +187,8 @@
   components:
   - type: Sprite
     sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
+  - type: Icon
+    sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
   - type: Item
     sprite: Objects/Weapons/Guns/Shotguns/pump.rsi
   - type: RangedWeapon
@@ -184,21 +198,23 @@
 
 - type: entity
   name: sawn-off shotgun
-  parent: BaseItem
+  parent: LauncherBase
   id: ShotgunSawn
   description: Omar's coming!
   components:
   - type: Sprite
-    netsync: false
     sprite: Objects/Weapons/Guns/Shotguns/sawn.rsi
     layers:
       - state: base
         map: ["enum.RangedBarrelVisualLayers.Base"]
       - state: bolt-closed
         map: ["enum.RangedBarrelVisualLayers.Bolt"]
-  - type: Item
+  - type: Icon
     sprite: Objects/Weapons/Guns/Shotguns/sawn.rsi
     state: icon
+  - type: Item
+    size: 24
+    sprite: Objects/Weapons/Guns/Shotguns/sawn.rsi
   - type: RangedWeapon
   - type: BoltActionBarrel
     caliber: Shotgun
@@ -206,8 +222,8 @@
     allSelectors:
     - Single
     fillPrototype: ShellShotgun
-    capacity: 2
     fireRate: 8.0
+    capacity: 2
     minAngle: 10
     maxAngle: 90
     angleIncrease: 45

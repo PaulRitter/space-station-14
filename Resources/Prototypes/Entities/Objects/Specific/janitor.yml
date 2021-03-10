@@ -1,4 +1,5 @@
-﻿- type: entity
+# TODO: Add description (1)
+- type: entity
   parent: BaseItem
   name: mop
   id: MopItem
@@ -13,25 +14,33 @@
   - type: Mop
   - type: SolutionContainer
     maxVol: 10
-    caps: AddTo, RemoveFrom
-  - type: LoopingSound
 
 - type: entity
   name: mop bucket
   id: MopBucket
   description: Holds water and the tears of the janitor.
+  suffix: Full
   components:
   - type: Clickable
   - type: Sprite
-    texture: Objects/Specific/Janitorial/mopbucket.png
+    sprite: Objects/Specific/Janitorial/janitorial.rsi
+    layers:
+    - state: mopbucket
+    - state: mopbucket_water
     drawdepth: Objects
   - type: InteractionOutline
   - type: Bucket
   - type: LoopingSound
   - type: SolutionContainer
     maxVol: 500
-    caps: AddTo, RemoveFrom
-  - type: Collidable
+    contents:
+      reagents:
+        - ReagentId: chem.Water
+          Quantity: 500
+
+  - type: Physics
+    mass: 5
+    anchored: false
     shapes:
     - !type:PhysShapeAabb
       bounds: "-0.40,-0.25,0.25,0.25"
@@ -40,11 +49,6 @@
       - Opaque
       layer:
       - Opaque
-    IsScrapingFloor: true
-  - type: Physics
-    mass: 5
-    anchored: false
-  - type: Spillable
   - type: Pullable
 
 - type: entity
@@ -55,23 +59,23 @@
   components:
   - type: Clickable
   - type: Sprite
-    texture: Objects/Specific/Janitorial/bucket.png
+    sprite: Objects/Specific/Janitorial/janitorial.rsi
+    layers:
+    - state: bucket
+    - state: bucket_water
     drawdepth: Objects
   - type: Bucket
   - type: LoopingSound
   - type: SolutionContainer
     maxVol: 500
-    caps: AddTo, RemoveFrom
-  - type: Collidable
+  - type: Physics
+    mass: 5
+    anchored: false
     shapes:
     - !type:PhysShapeAabb
       bounds: "-0.25,-0.25,0.25,0.25"
       mask:
       - Impassable
-    IsScrapingFloor: true
-  - type: Physics
-    mass: 5
-    anchored: false
   - type: Spillable
 
 - type: entity
@@ -99,7 +103,7 @@
     sprite: Objects/Specific/Janitorial/soap.rsi
   - type: Slippery
     paralyzeTime: 2.5
-  - type: Collidable
+  - type: Physics
     shapes:
     - !type:PhysShapeAabb
       bounds: "-0.3,-0.4,0.3,0.4"
@@ -110,7 +114,7 @@
   name: soap
   id: SoapNT
   parent: Soap
-  description: A Nanotrasen brand bar of soap. Smells of phoron.
+  description: A Nanotrasen brand bar of soap. Smells of plasma.
   components:
     - type: Sprite
       state: soapnt
@@ -174,7 +178,7 @@
         - state: chempuff
           map: [ "enum.VaporVisualLayers.Base" ]
     - type: Physics
-    - type: Collidable
+      anchored: false
       hard: false
       shapes:
         - !type:PhysShapeAabb
@@ -195,11 +199,12 @@
   description: A spray bottle with an unscrewable top.
   components:
   - type: Sprite
-    texture: Objects/Specific/Janitorial/cleaner.png
+    sprite: Objects/Specific/Janitorial/janitorial.rsi
+    state: cleaner
   - type: SolutionContainer
     maxVol: 100
-    caps: AddTo, RemoveFrom
-  - type: Pourable
+    caps: Refillable, Drainable
+  - type: SolutionTransfer
     transferAmount: 5.0
   - type: Spillable
   - type: ItemCooldown
@@ -216,10 +221,9 @@
   components:
     - type: SolutionContainer
       maxVol: 100
-      caps: AddTo, RemoveFrom
       contents:
         reagents:
-          - ReagentId: chem.H2O
+          - ReagentId: chem.Water
             Quantity: 100
 
 - type: entity
@@ -231,8 +235,22 @@
   components:
     - type: SolutionContainer
       maxVol: 100
-      caps: AddTo, RemoveFrom
       contents:
         reagents:
           - ReagentId: chem.SpaceCleaner
             Quantity: 100
+
+
+- type: entity
+  name: trash bag
+  id: TrashBag
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Janitorial/trashbag.rsi
+    state: icon
+  - type: Storage
+    capacity: 125
+    quickInsert: true
+    areaInsert: true
+    storageSoundCollection: trashBagRustle

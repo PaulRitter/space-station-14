@@ -1,4 +1,4 @@
-﻿- type: entity
+- type: entity
   id: base_wall
   name: basewall
   description: Keeps the air in and the greytide out.
@@ -9,13 +9,17 @@
     - Wall
   components:
   - type: RCDDeconstructWhitelist
+  - type: Tag
+    tags:
+    - Wall
   - type: Clickable
   - type: InteractionOutline
   - type: Sprite
     netsync: false
     drawdepth: Walls
-
-  - type: Collidable
+  - type: Icon
+    state: full
+  - type: Physics
     shapes:
     - !type:PhysShapeAabb
       layer:
@@ -24,17 +28,12 @@
       - MobImpassable
       - VaultImpassable
       - SmallImpassable
-  - type: Destructible
-    deadThreshold: 500
-    spawnOnDestroy: Girder
-    resistances: metallicResistances
   - type: Occluder
     sizeX: 32
     sizeY: 32
   - type: SnapGrid
     offset: Center
   - type: Airtight
-
   - type: IconSmooth
     key: walls
     base: solid
@@ -46,11 +45,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/brick.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/brick.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: brick
@@ -62,11 +73,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/clock.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/clock.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: clock
@@ -78,11 +101,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/clown.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/clown.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: clown
@@ -95,11 +130,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/cult.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/cult.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: cult
@@ -111,11 +158,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/debug.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/debug.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: debug
@@ -127,11 +186,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/diamond.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/diamond.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: diamond
@@ -144,11 +215,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/gold.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/gold.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: gold
@@ -160,11 +243,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/ice.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/ice.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: ice
@@ -176,11 +271,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/metal.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/metal.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: metal
@@ -192,11 +299,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/plasma.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/plasma.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: plasma
@@ -208,11 +327,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/plastic.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/plastic.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: plastic
@@ -225,15 +356,31 @@
   - type: Sprite
     color: "#889192"
     sprite: Constructible/Structures/Walls/solid.rsi
-
-  - type: Destructible
-    deadThreshold: 600
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/solid.rsi
+    state: rgeneric
+  - type: Construction
+    graph: girder
+    node: reinforcedWall
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 600
+      behaviors:
+      - !type:ChangeConstructionNodeBehavior
+        node: girder
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
   - type: ReinforcedWall
     key: walls
     base: solid
     reinforcedBase: reinf_over
+  - type: Appearance
+    visuals:
+      - type: ReinforcedWallVisualizer
 
 # Riveting
 - type: entity
@@ -243,11 +390,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/riveted.rsi
-
-  - type: Destructible
-    deadThreshold: 1000
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/riveted.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 1000
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: riveted
@@ -259,11 +418,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/sandstone.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/sandstone.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: sandstone
@@ -275,11 +446,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/silver.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/silver.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: silver
@@ -292,12 +475,26 @@
   - type: Sprite
     color: "#889192"
     sprite: Constructible/Structures/Walls/solid.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
-    destroySound: /Audio/Effects/metalbreak.ogg
+  - type: Construction
+    graph: girder
+    node: wall
+  - type: Icon
+    sprite: Constructible/Structures/Walls/solid.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound: /Audio/Effects/metalbreak.ogg
+      - !type:ChangeConstructionNodeBehavior
+        node: girder
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
+    destroySound: /Audio/Effects/metalbreak.ogg
   - type: IconSmooth
     key: walls
     base: solid
@@ -309,11 +506,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/uranium.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/uranium.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: uranium
@@ -325,11 +534,23 @@
   components:
   - type: Sprite
     sprite: Constructible/Structures/Walls/wood.rsi
-
-  - type: Destructible
-    deadThreshold: 300
-    spawnOnDestroy: Girder
+  - type: Icon
+    sprite: Constructible/Structures/Walls/wood.rsi
+  - type: Damageable
     resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          Girder:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
   - type: IconSmooth
     key: walls
     base: wood

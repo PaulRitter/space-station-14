@@ -1,24 +1,28 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using Content.Shared.GameObjects.Components.Body;
+using Content.Shared.GameObjects.Components.Mobs.State;
+using Content.Shared.GameObjects.Components.Storage;
+using Content.Shared.Interfaces.GameObjects.Components;
+using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.GameObjects.Components.UserInterface;
-using Robust.Shared.Interfaces.GameObjects;
-using Robust.Shared.Interfaces.GameObjects.Components;
-using Robust.Shared.IoC;
 using Robust.Shared.Physics;
 using Robust.Shared.Serialization;
+using Robust.Shared.ViewVariables;
 
 namespace Content.Shared.GameObjects.Components.Disposal
 {
-    public abstract class SharedDisposalUnitComponent : Component, ICollideSpecial
+    public abstract class SharedDisposalUnitComponent : Component, ICollideSpecial, IDragDropOn
     {
-        [Dependency] private readonly IEntityManager _entityManager = default!;
-
         public override string Name => "DisposalUnit";
 
-        private readonly List<IEntity> _intersecting = new List<IEntity>();
+        private readonly List<IEntity> _intersecting = new();
+
+        [ViewVariables]
+        public bool Anchored =>
+            !Owner.TryGetComponent(out IPhysicsComponent? physics) ||
+            physics.Anchored;
 
         [Serializable, NetSerializable]
         public enum Visuals
@@ -71,7 +75,7 @@ namespace Content.Shared.GameObjects.Components.Disposal
         bool ICollideSpecial.PreventCollide(IPhysBody collided)
         {
             if (IsExiting(collided.Entity)) return true;
-            if (!Owner.TryGetComponent(out IContainerManager manager)) return false;
+            if (!Owner.TryGetComponent(out IContainerManager? manager)) return false;
 
             if (manager.ContainsEntity(collided.Entity))
             {
@@ -98,13 +102,12 @@ namespace Content.Shared.GameObjects.Components.Disposal
         {
             if(_intersecting.Count == 0) return;
 
-            var intersectingEntities = _entityManager.GetEntitiesIntersecting(Owner);
             for (var i = _intersecting.Count - 1; i >= 0; i--)
             {
-                if (!intersectingEntities.Contains(_intersecting[i]))
-                {
+                var entity = _intersecting[i];
+
+                if (!Owner.EntityManager.IsIntersecting(entity, Owner))
                     _intersecting.RemoveAt(i);
-                }
             }
         }
 
@@ -127,14 +130,14 @@ namespace Content.Shared.GameObjects.Components.Disposal
                 Engaged = engaged;
             }
 
-            public bool Equals(DisposalUnitBoundUserInterfaceState other)
+            public bool Equals(DisposalUnitBoundUserInterfaceState? other)
             {
                 if (ReferenceEquals(null, other)) return false;
                 if (ReferenceEquals(this, other)) return true;
-                return UnitName == other.UnitName && 
-                       UnitState == other.UnitState && 
-                       Powered == other.Powered && 
-                       Engaged == other.Engaged && 
+                return UnitName == other.UnitName &&
+                       UnitState == other.UnitState &&
+                       Powered == other.Powered &&
+                       Engaged == other.Engaged &&
                        Pressure.Equals(other.Pressure);
             }
         }
@@ -158,5 +161,34 @@ namespace Content.Shared.GameObjects.Components.Disposal
         {
             Key
         }
+
+        public virtual bool CanInsert(IEntity entity)
+        {
+            if (!Anchored)
+                return false;
+
+            if (!entity.TryGetComponent(out IPhysicsComponent? physics) ||
+                !physics.CanCollide)
+            {
+                if (!(entity.TryGetComponent(out IMobStateComponent? damageState) && damageState.IsDead())) {
+                    return false;
+                }
+            }
+
+            if (!entity.HasComponent<SharedStorableComponent>() &&
+                !entity.HasComponent<IBody>())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public virtual bool CanDragDropOn(DragDropEventArgs eventArgs)
+        {
+            return CanInsert(eventArgs.Dragged);
+        }
+
+        public abstract bool DragDropOn(DragDropEventArgs eventArgs);
     }
 }

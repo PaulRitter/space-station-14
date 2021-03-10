@@ -1,15 +1,45 @@
 ﻿- type: entity
-  id: ComputerBase
-  name: computer
-  abstract: true
+  id: ComputerFrame
+  name: computer frame
+  description: "A computer under construction. It needs a circuit board."
+  placement:
+    mode: SnapgridCenter
+  components:
+    - type: Physics
+      mass: 25
+      anchored: true
+      shapes:
+      - !type:PhysShapeAabb
+        bounds: "-0.5,-0.25,0.5,0.25"
+        layer:
+        - Impassable
+        - MobImpassable
+        - VaultImpassable
+        - Opaque
+        mask:
+        - Impassable
+        - MobImpassable
+        - VaultImpassable
+    - type: Clickable
+    - type: InteractionOutline
+    - type: Anchorable
+    - type: Rotatable
+    - type: Pullable
+    - type: Construction
+      graph: computer
+      node: frameUnsecured
+    - type: Sprite
+      sprite: "Constructible/Misc/stock_parts.rsi"
+      state: "0"
+
+- type: entity
+  id: ComputerBroken
+  name: broken computer
+  description: "This computer has seen better days."
   components:
   - type: Physics
     mass: 25
     anchored: true
-  - type: Clickable
-  - type: InteractionOutline
-  - type: Collidable
-    IsScrapingFloor: true
     shapes:
     - !type:PhysShapeAabb
       bounds: "-0.5,-0.25,0.5,0.25"
@@ -22,11 +52,60 @@
       - Impassable
       - MobImpassable
       - VaultImpassable
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Anchorable
+  - type: Construction
+    graph: computer
+    node: monitorBroken
+  - type: Sprite
+    sprite: "Constructible/Power/computers.rsi"
+    state: "broken"
 
+- type: entity
+  id: ComputerBase
+  name: computer
+  abstract: true
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Construction
+    graph: computer
+    node: computer
+  - type: Rotatable
+  - type: Physics
+    mass: 25
+    anchored: true
+    shapes:
+    - !type:PhysShapeAabb
+      bounds: "-0.5,-0.25,0.5,0.25"
+      layer:
+      - Impassable
+      - MobImpassable
+      - VaultImpassable
+      - Opaque
+      mask:
+      - Impassable
+      - MobImpassable
+      - VaultImpassable
   - type: Computer
   - type: PowerReceiver
   - type: Anchorable
-
+  - type: Pullable
+  - type: Damageable
+    resistances: metallicResistances
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:ChangeConstructionNodeBehavior
+        node: monitorBroken
+      - !type:DoActsBehavior
+        acts: ["Destruction"]
   - type: Sprite
     sprite: Constructible/Power/computers.rsi
     layers:
@@ -40,19 +119,17 @@
     - state: generic_key
       shader: unshaded
       map: ["enum.ComputerVisualizer+Layers.KeyboardOn"]
-
   - type: Appearance
     visuals:
     - type: ComputerVisualizer
       key: generic_key
       screen: generic
 
-
 - type: entity
   id: ComputerAlert
   parent: ComputerBase
   name: alerts computer
-  description: Used to access the station's automated alert system.
+  description: "Used to access the station's automated alert system."
   components:
   - type: Appearance
     visuals:
@@ -60,12 +137,11 @@
       key: atmos_key
       screen: "alert-2"
 
-
 - type: entity
   id: ComputerPowerMonitoring
   parent: ComputerBase
   name: power monitoring computer
-  description: It monitors power levels across the station.
+  description: "It monitors power levels across the station."
   components:
   - type: Appearance
     visuals:
@@ -73,59 +149,11 @@
       key: power_key
       screen: power_monitor
 
-
-- type: entity
-  id: ComputerSupplyOrdering
-  parent: ComputerBase
-  name: Cargo ordering computer
-  description: Used to order supplies, approve requests, and control the shuttle.
-  components:
-  - type: Appearance
-    visuals:
-    - type: ComputerVisualizer
-      key: tech_key
-      screen: supply
-  - type: CargoConsole
-  - type: CargoOrderDatabase
-  - type: GalacticMarket
-    static: true
-    products:
-      - cargo.dice
-      - cargo.Medkit
-      - cargo.flashlight
-      - cargo.lightblub
-      - cargo.fireextinguisher
-      - cargo.pen
-      - cargo.bikehorn
-      - cargo.cleaver
-      - cargo.fueltank
-      - cargo.medscanner
-      - cargo.glass
-      - cargo.cable
-  - type: UserInterface
-    interfaces:
-    - key: enum.CargoConsoleUiKey.Key
-      type: CargoConsoleBoundUserInterface
-
-- type: entity
-  id: ComputerSupplyRequest
-  parent: ComputerSupplyOrdering
-  name: cargo request computer
-  description: Used to request supplies from cargo.
-  components:
-  - type: Appearance
-    visuals:
-    - type: ComputerVisualizer
-      key: tech_key
-      screen: request
-  - type: CargoConsole
-    requestOnly: true
-
 - type: entity
   id: ComputerMedicalRecords
   parent: ComputerBase
   name: medical records computer
-  description: This can be used to check medical records.
+  description: "This can be used to check medical records."
   components:
   - type: Appearance
     visuals:
@@ -133,12 +161,11 @@
       key: med_key
       screen: medcomp
 
-
 - type: entity
   id: ComputerResearchAndDevelopment
   parent: ComputerBase
   name: R&D computer
-  description: 'A computer used to interface with R&D tools.'
+  description: "A computer used to interface with R&D tools."
   components:
   - type: Appearance
     visuals:
@@ -157,12 +184,14 @@
   - type: PowerReceiver
     load: 200
     priority: Low
+  - type: Computer
+    board: ResearchComputerCircuitboard
 
 - type: entity
   id: ComputerId
   parent: ComputerBase
   name: ID card computer
-  description: Terminal for programming Nanotrasen employee ID cards to access parts of the station.
+  description: "Terminal for programming Nanotrasen employee ID cards to access parts of the station."
   components:
   - type: AccessReader
     access: [["HeadOfPersonnel"]]
@@ -176,12 +205,14 @@
     - type: ComputerVisualizer
       key: id_key
       screen: id
+  - type: Computer
+    board: IDComputerCircuitboard
 
 - type: entity
   id: computerBodyScanner
   parent: ComputerBase
   name: body scanner computer
-  description: That's a body scanner.
+  description: "That's a body scanner."
   components:
   - type: BodyScanner
   - type: UserInterface
@@ -193,12 +224,14 @@
     - type: ComputerVisualizer
       key: generic_key
       screen: generic
+  - type: Computer
+    board: BodyScannerComputerCircuitboard
 
 - type: entity
   id: ComputerComms
   parent: ComputerBase
   name: communications computer
-  description: This can be used for various important functions. Still under developement.
+  description: "This can be used for various important functions. Still under developement."
   components:
   - type: Appearance
     visuals:
@@ -210,12 +243,14 @@
     interfaces:
     - key: enum.CommunicationsConsoleUiKey.Key
       type: CommunicationsConsoleBoundUserInterface
+  - type: Computer
+    board: CommsComputerCircuitboard
 
 - type: entity
   id: ComputerSolarControl
   parent: ComputerBase
   name: Solar Control Computer
-  description: A controller for solar panel arrays.
+  description: "A controller for solar panel arrays."
   components:
   - type: Appearance
     visuals:
@@ -227,3 +262,5 @@
     interfaces:
     - key: enum.SolarControlConsoleUiKey.Key
       type: SolarControlConsoleBoundUserInterface
+  - type: Computer
+    board: SolarControlComputerCircuitboard

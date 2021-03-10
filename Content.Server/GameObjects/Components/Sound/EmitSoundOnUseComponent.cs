@@ -1,10 +1,10 @@
 ﻿using Content.Shared.Audio;
 using Content.Shared.Interfaces.GameObjects.Components;
-using Robust.Server.GameObjects.EntitySystems;
+using Robust.Server.GameObjects;
 using Robust.Shared.Audio;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
+using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Sound
 {
@@ -18,15 +18,9 @@ namespace Content.Server.GameObjects.Components.Sound
         ///
         public override string Name => "EmitSoundOnUse";
 
-        public string _soundName;
-        public float _pitchVariation;
-
-        public override void ExposeData(ObjectSerializer serializer)
-        {
-            base.ExposeData(serializer);
-            serializer.DataField(ref _soundName, "sound", string.Empty);
-            serializer.DataField(ref _pitchVariation, "variation", 0.0f);
-        }
+        [ViewVariables(VVAccess.ReadWrite)] [DataField("sound")] public string _soundName;
+        [ViewVariables(VVAccess.ReadWrite)] [DataField("variation")] public float _pitchVariation;
+        [ViewVariables(VVAccess.ReadWrite)] [DataField("semitoneVariation")] public int _semitoneVariation;
 
         bool IUse.UseEntity(UseEntityEventArgs eventArgs)
         {
@@ -35,6 +29,11 @@ namespace Content.Server.GameObjects.Components.Sound
                 if (_pitchVariation > 0.0)
                 {
                     EntitySystem.Get<AudioSystem>().PlayFromEntity(_soundName, Owner, AudioHelpers.WithVariation(_pitchVariation).WithVolume(-2f));
+                    return true;
+                }
+                if (_semitoneVariation > 0)
+                {
+                    EntitySystem.Get<AudioSystem>().PlayFromEntity(_soundName, Owner, AudioHelpers.WithSemitoneVariation(_semitoneVariation).WithVolume(-2f));
                     return true;
                 }
                 EntitySystem.Get<AudioSystem>().PlayFromEntity(_soundName, Owner, AudioParams.Default.WithVolume(-2f));

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
+using System;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Systems;
 using Robust.Shared.Map;
 using Robust.Shared.Serialization;
-using Robust.Shared.Utility;
 using Content.Shared.Atmos;
+using Robust.Shared.Maths;
 
 namespace Content.Shared.GameObjects.EntitySystems.Atmos
 {
@@ -22,13 +21,15 @@ namespace Content.Shared.GameObjects.EntitySystems.Atmos
             public readonly float[] Moles;
             public readonly AtmosDirection PressureDirection;
             public readonly bool InExcitedGroup;
+            public readonly AtmosDirection BlockDirection;
 
-            public AtmosDebugOverlayData(float temperature, float[] moles, AtmosDirection pressureDirection, bool inExcited)
+            public AtmosDebugOverlayData(float temperature, float[] moles, AtmosDirection pressureDirection, bool inExcited, AtmosDirection blockDirection)
             {
                 Temperature = temperature;
                 Moles = moles;
                 PressureDirection = pressureDirection;
                 InExcitedGroup = inExcited;
+                BlockDirection = blockDirection;
             }
         }
 
@@ -41,16 +42,21 @@ namespace Content.Shared.GameObjects.EntitySystems.Atmos
         {
             public GridId GridId { get; }
 
-            public MapIndices BaseIdx { get; }
+            public Vector2i BaseIdx { get; }
             // LocalViewRange*LocalViewRange
             public AtmosDebugOverlayData[] OverlayData { get; }
 
-            public AtmosDebugOverlayMessage(GridId gridIndices, MapIndices baseIdx, AtmosDebugOverlayData[] overlayData)
+            public AtmosDebugOverlayMessage(GridId gridIndices, Vector2i baseIdx, AtmosDebugOverlayData[] overlayData)
             {
                 GridId = gridIndices;
                 BaseIdx = baseIdx;
                 OverlayData = overlayData;
             }
+        }
+
+        [Serializable, NetSerializable]
+        public sealed class AtmosDebugOverlayDisableMessage : EntitySystemMessage
+        {
         }
     }
 }

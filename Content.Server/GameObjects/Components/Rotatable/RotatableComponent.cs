@@ -1,11 +1,13 @@
-﻿using Content.Shared.GameObjects.EntitySystems;
+﻿using Content.Shared.GameObjects.EntitySystems.ActionBlocker;
 using Content.Shared.GameObjects.Verbs;
 using Content.Shared.Interfaces;
 using Robust.Shared.GameObjects;
-using Robust.Shared.GameObjects.Components;
-using Robust.Shared.Interfaces.GameObjects;
 using Robust.Shared.Localization;
 using Robust.Shared.Maths;
+using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
+using Robust.Shared.Serialization.Manager.Attributes;
+using Robust.Shared.ViewVariables;
 
 namespace Content.Server.GameObjects.Components.Rotatable
 {
@@ -14,11 +16,18 @@ namespace Content.Server.GameObjects.Components.Rotatable
     {
         public override string Name => "Rotatable";
 
+        /// <summary>
+        ///     If true, this entity can be rotated even while anchored.
+        /// </summary>
+        [ViewVariables(VVAccess.ReadWrite)]
+        [DataField("rotateWhileAnchored")]
+        public bool RotateWhileAnchored { get; private set; }
+
         private void TryRotate(IEntity user, Angle angle)
         {
-            if (Owner.TryGetComponent(out ICollidableComponent collidable))
+            if (!RotateWhileAnchored && Owner.TryGetComponent(out IPhysicsComponent physics))
             {
-                if (collidable.Anchored)
+                if (physics.Anchored)
                 {
                     Owner.PopupMessage(user, Loc.GetString("It's stuck."));
                     return;
@@ -33,7 +42,7 @@ namespace Content.Server.GameObjects.Components.Rotatable
         {
             protected override void GetData(IEntity user, RotatableComponent component, VerbData data)
             {
-                if (!ActionBlockerSystem.CanInteract(user))
+                if (!ActionBlockerSystem.CanInteract(user) || (!component.RotateWhileAnchored && component.Owner.TryGetComponent(out IPhysicsComponent physics) && physics.Anchored))
                 {
                     data.Visibility = VerbVisibility.Invisible;
                     return;
@@ -55,7 +64,7 @@ namespace Content.Server.GameObjects.Components.Rotatable
         {
             protected override void GetData(IEntity user, RotatableComponent component, VerbData data)
             {
-                if (!ActionBlockerSystem.CanInteract(user))
+                if (!ActionBlockerSystem.CanInteract(user) || (!component.RotateWhileAnchored && component.Owner.TryGetComponent(out IPhysicsComponent physics) && physics.Anchored))
                 {
                     data.Visibility = VerbVisibility.Invisible;
                     return;

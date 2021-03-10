@@ -8,7 +8,6 @@
   - type: Sprite
     drawdepth: FloorObjects
   - type: SolutionContainer
-    caps: AddTo, RemoveFrom
   - type: Puddle
     spill_sound: /Audio/Effects/Fluids/splat.ogg
     recolor: true
@@ -16,7 +15,7 @@
   - type: InteractionOutline
   - type: Clickable
   - type: Slippery
-  - type: Collidable
+  - type: Physics
     shapes:
     - !type:PhysShapeAabb
       bounds: "-0.4,-0.4,0.4,0.4"
