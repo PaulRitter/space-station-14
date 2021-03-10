@@ -1,46 +1,65 @@
 ﻿using System;
 using System.Collections.Generic;
-using Robust.Shared.GameObjects.Systems;
+using System.Linq;
+using Robust.Shared.GameObjects;
+using Robust.Shared.IoC;
+using Robust.Shared.Map;
 using Robust.Shared.Maths;
-using Robust.Shared.Utility;
+using Robust.Shared.Random;
 
 namespace Content.Server.GameObjects.EntitySystems
 {
 
     public class SalvageCrewSystem : EntitySystem
     {
-        public struct SalvageCrewObjectShape
+        public struct SalvageCrewAsteroid
         {
-            public Vector2i[] offsets;
+            public readonly Vector2i[] Offsets;
+            public readonly IMapGrid Grid;
 
-            public SalvageCrewObjectShape(float n, float ne, float e, float se, float s, float sw, float w, float nw)
+            public SalvageCrewAsteroid(IMapGrid grid, int maxSize, IRobustRandom random) : this(
+                grid,
+                random.Next(1, maxSize),
+                random.Next(1, maxSize),
+                random.Next(1, maxSize),
+                random.Next(1, maxSize),
+                random.Next(1, maxSize),
+                random.Next(1, maxSize),
+                random.Next(1, maxSize),
+                random.Next(1, maxSize)){}
+
+            public SalvageCrewAsteroid(IMapGrid grid, float n, float ne, float e, float se, float s, float sw, float w, float nw)
             {
-                Vector2[] anchors_raw = new Vector2[8];
-                anchors_raw[0] = new Vector2(0, -1)*n;
-                anchors_raw[1] = new Vector2(1, -1)*ne;
-                anchors_raw[2] = new Vector2(1, 0)*e;
-                anchors_raw[3] = new Vector2(1, 1)*se;
-                anchors_raw[4] = new Vector2(0, 1)*s;
-                anchors_raw[5] = new Vector2(-1, 1)*sw;
-                anchors_raw[6] = new Vector2(-1, 0)*w;
-                anchors_raw[7] = new Vector2(-1, -1)*nw;
+                Grid = grid;
+                var anchorsRaw = new Vector2[8];
+                anchorsRaw[0] = new Vector2(0, -1)*n;
+                anchorsRaw[1] = new Vector2(1, -1)*ne;
+                anchorsRaw[2] = new Vector2(1, 0)*e;
+                anchorsRaw[3] = new Vector2(1, 1)*se;
+                anchorsRaw[4] = new Vector2(0, 1)*s;
+                anchorsRaw[5] = new Vector2(-1, 1)*sw;
+                anchorsRaw[6] = new Vector2(-1, 0)*w;
+                anchorsRaw[7] = new Vector2(-1, -1)*nw;
 
-                List<Vector2i> positions = new List<Vector2i>();
-                for (int i = 0; i < anchors_raw.Length; i++)
+                var positions = new HashSet<Vector2i>();
+                for (int i = 0; i < anchorsRaw.Length; i++)
                 {
-                    var start = anchors_raw[i].ToVector2i();
-                    var end = i+1 == anchors_raw.Length ? anchors_raw[0].ToVector2i() : anchors_raw[i + 1].ToVector2i();
+                    var start = anchorsRaw[i].ToVector2i();
+                    var end = i+1 == anchorsRaw.Length ? anchorsRaw[0].ToVector2i() : anchorsRaw[i + 1].ToVector2i();
 
-                    positions.AddRange(GetPointsBetween(start, end));
+                    positions.UnionWith(GetPointsInTriangle(start, end, (0,0)));
                 }
 
-                offsets = positions.ToArray();
+                Offsets = positions.ToArray();
+                foreach (var vec in Offsets)
+                {
+                    grid.SetTile(new EntityCoordinates(grid.GridEntityId, vec), new Tile(IoCManager.Resolve<ITileDefinitionManager>()["floor_steel"].TileId));
+                }
             }
 
-            private static List<Vector2i> GetPointsBetween(Vector2i p1, Vector2i p2)
+            private static IEnumerable<Vector2i> GetPointsBetween(Vector2i p1, Vector2i p2, float stepSize)
             {
-                var step_size = 0.1f;
-                var points = new List<Vector2i>();
+                var points = new HashSet<Vector2i>();
                 var pointer = p1.ToVector2();
 
                 int CompareX(Vector2i start, Vector2i end)
@@ -52,19 +71,33 @@ namespace Content.Server.GameObjects.EntitySystems
                     return end.Y.CompareTo(start.Y);
                 }
 
-                int x_comp = CompareX(p1, p2);
-                int y_comp = CompareY(p1, p2);
+                var xComp = CompareX(p1, p2);
+                var yComp = CompareY(p1, p2);
 
-                Vector2 delta = (p2 - p1).ToVector2() * step_size;
-                var pointer_floored = pointer.ToVector2i();
-                while ((x_comp != CompareX(p2, pointer_floored) || x_comp == 0) && (y_comp != CompareY(p2, pointer_floored) || y_comp == 0))
+                var delta = (p2 - p1).ToVector2() * stepSize;
+                var pointerFloored = pointer.ToVector2i();
+                while ((xComp != CompareX(p2, pointerFloored) || xComp == 0) && (yComp != CompareY(p2, pointerFloored) || yComp == 0))
                 {
-                    if(!points.Contains(pointer_floored)) points.Add(pointer_floored);
+                    if (!points.Contains(pointerFloored))
+                    {
+                        points.Add(pointerFloored);
+                        yield return pointerFloored;
+                    }
                     pointer += delta;
-                    pointer_floored = pointer.ToVector2i();
+                    pointerFloored = pointer.ToVector2i();
+                }
+            }
+
+            private static HashSet<Vector2i> GetPointsInTriangle(Vector2i a, Vector2i b, Vector2i c,
+                float stepSize = 0.01f)
+            {
+                var set = new HashSet<Vector2i>();
+                foreach (var ab in GetPointsBetween(a,b, stepSize))
+                {
+                    set.UnionWith(GetPointsBetween(ab,c, stepSize));
                 }
 
-                return points;
+                return set;
             }
         }
     }

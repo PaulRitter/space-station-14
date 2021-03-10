@@ -1,0 +1,43 @@
+﻿- type: entity
+  id: SalvageMagnet
+  name: salvage magnet
+  placement:
+    mode: SnapgridCenter
+  components:
+    - type: Clickable
+    - type: InteractionOutline
+    - type: Sprite
+      sprite: Constructible/Power/VendingMachines/empty.rsi
+      state: off
+      netsync: false
+    - type: Physics
+      anchored: true
+      shapes:
+        - !type:PhysShapeAabb
+          #bounds: "-0.5,-0.5,0.5,0.5"
+          mask:
+            - Impassable
+            - MobImpassable
+            - VaultImpassable
+            - SmallImpassable
+          layer:
+            - Opaque
+            - Impassable
+            - MobImpassable
+            - VaultImpassable
+            - SmallImpassable
+    - type: SnapGrid
+      offset: Center
+    - type: Damageable
+      resistances: metallicResistances
+    - type: Destructible
+      thresholds:
+        - trigger:
+            !type:DamageTrigger
+            damage: 50
+          behaviors:
+            - !type:DoActsBehavior
+              acts: ["Breakage"]
+    - type: Anchorable
+    - type: Pullable
+    - type: SignalReceiver

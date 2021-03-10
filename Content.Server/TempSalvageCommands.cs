@@ -1,22 +1,20 @@
 ﻿using System.Linq;
+using Content.Server.Administration;
 using Content.Server.GameObjects.EntitySystems;
-using Robust.Server.Interfaces.Console;
-using Robust.Server.Interfaces.Player;
-using Robust.Shared.GameObjects.Systems;
-using Robust.Shared.Interfaces.Map;
+using Content.Shared.Administration;
+using Robust.Shared.Console;
 using Robust.Shared.IoC;
 using Robust.Shared.Map;
-using Robust.Shared.Maths;
-using Robust.Shared.Utility;
 
 namespace Content.Server
 {
-    public class TempSalvageCommands : IClientCommand
+    [AdminCommand(AdminFlags.Host)]
+    public class TempSalvageCommands : IConsoleCommand
     {
         public string Command => "salvagetest";
         public string Description => "salvagetest.";
         public string Help => $"{Command}";
-        public void Execute(IConsoleShell shell, IPlayerSession? player, string[] args)
+        public void Execute(IConsoleShell shell, string argStr, string[] args)
         {
             float[] distances = new float[8] {1,1,1,1,1,1,1,1};
             for (int i = 0; i < distances.Length && i < args.Length; i++)
@@ -27,24 +25,14 @@ namespace Content.Server
                 }
             }
 
-            var shape = new SalvageCrewSystem.SalvageCrewObjectShape(distances[0], distances[1], distances[2],
-                distances[3], distances[4], distances[5], distances[6], distances[7]);
-
-            var min_x = shape.offsets.Min(v => v.X);
-            var min_y = shape.offsets.Min(v => v.Y);
-            var max_x = shape.offsets.Max(v => v.X);
-            var max_y = shape.offsets.Max(v => v.Y);
-
-            var entity = player.AttachedEntity;
+            var entity = shell.Player?.AttachedEntity;
             if (entity == null) return;
 
             var grid = IoCManager.Resolve<IMapManager>().CreateGrid(entity.Transform.MapID);
             grid.WorldPosition = entity.Transform.WorldPosition;
 
-            foreach (var vec in shape.offsets)
-            {
-                grid.SetTile(new EntityCoordinates(grid.GridEntityId, vec), new Tile(IoCManager.Resolve<ITileDefinitionManager>()["floor_steel"].TileId));
-            }
+            var shape = new SalvageCrewSystem.SalvageCrewAsteroid(grid, distances[0], distances[1], distances[2],
+                distances[3], distances[4], distances[5], distances[6], distances[7]);
 
             /*var msg = "Grid:";
             for (int y = min_y; y <= max_y; y++)
