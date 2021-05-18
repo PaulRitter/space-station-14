@@ -26,6 +26,7 @@ namespace Content.Client.UserInterface.AdminMenu
         {
             _netManager.RegisterNetMessage<AdminMenuPlayerListRequest>(AdminMenuPlayerListRequest.NAME);
             _netManager.RegisterNetMessage<AdminMenuPlayerListMessage>(AdminMenuPlayerListMessage.NAME, HandlePlayerListMessage);
+            _netManager.RegisterNetMessage<AdminMenuLogMessage>(AdminMenuLogMessage.NAME, HandleLogMessage);
 
             _commandWindows = new List<SS14Window>();
             // Reset the AdminMenu Window on disconnect
@@ -69,6 +70,16 @@ namespace Content.Client.UserInterface.AdminMenu
         private void HandlePlayerListMessage(AdminMenuPlayerListMessage msg)
         {
             _window?.RefreshPlayerList(msg.PlayersInfo);
+        }
+
+        private void RequestLogs(AdminMenuLogRequest request)
+        {
+
+        }
+
+        private void HandleLogMessage(AdminMenuLogMessage message)
+        {
+
         }
 
         public void ResetWindow()

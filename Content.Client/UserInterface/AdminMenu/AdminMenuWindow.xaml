@@ -5,7 +5,7 @@
     xmlns:adminbusTab="clr-namespace:Content.Client.UserInterface.AdminMenu.Tabs.AdminbusTab"
     xmlns:atmosTab="clr-namespace:Content.Client.UserInterface.AdminMenu.Tabs.AtmosTab">
     <TabContainer Name="MasterTabContainer">
-        <adminTab:AdminTab />
+        <adminTab:AdminTab Name="AdminTabControl" />
         <adminbusTab:AdminbusTab />
         <atmosTab:AtmosTab />
         <adminMenu:RoundTab />

@@ -12,6 +12,7 @@
             <amc:CommandButton Command="aghost" Text="{Loc Admin Ghost}" />
             <amc:UICommandButton Command="tpto" Text="{Loc Teleport}" WindowType="{x:Type at:TeleportWindow}" />
             <amc:CommandButton Command="permissions" Text="{Loc Permissions Panel}" />
+            <amc:UICommandButton Command="logs" Text="{Loc Logs}" WindowType="{x:Type at:LogWindow}" Name="LogButtonControl"/>
         </GridContainer>
     </VBoxContainer>
 </Control>
