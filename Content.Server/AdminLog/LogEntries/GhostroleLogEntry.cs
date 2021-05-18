@@ -15,6 +15,11 @@ namespace Content.Server.AdminLog.LogEntries
             RoleName = roleName;
             Entity = entity;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} RoleName={RoleName} Entity={Entity}";
+        }
     }
 
     public class GhostRoleCreationLogEntry : GhostRoleLogEntry

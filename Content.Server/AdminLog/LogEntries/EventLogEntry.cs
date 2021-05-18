@@ -17,6 +17,11 @@ namespace Content.Server.AdminLog.LogEntries
             Time = time;
             EventType = eventType;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} {(Admin != null ? $"Admin={Admin}" : "NoAdmin")} Time={Time} EventType={EventType}";
+        }
     }
 
     public class EventStartLogEntry : EventLogEntry

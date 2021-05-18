@@ -17,5 +17,10 @@ namespace Content.Server.AdminLog.LogEntries
             NewEntity = newEntity;
             Visit = visit;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} PreviousEntity={PreviousEntity} NewEntity={NewEntity} {(Visit ? "Visit" : "Transfer")}";
+        }
     }
 }

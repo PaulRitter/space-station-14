@@ -13,6 +13,11 @@ namespace Content.Server.AdminLog.LogEntries
         {
             Entity = entity;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Entity={Entity}";
+        }
     }
 
     public class SandboxGridCreationLogEntry : LogEntryWithUser
@@ -22,6 +27,11 @@ namespace Content.Server.AdminLog.LogEntries
         public SandboxGridCreationLogEntry(DateTime timestamp, EntityCoordinates entityCoordinates, MapCoordinates mapCoordinates, [NotNull] string accountname, EntityUid grid) : base(timestamp, entityCoordinates, mapCoordinates, accountname)
         {
             Grid = grid;
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Grid={Grid}";
         }
     }
 }

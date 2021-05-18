@@ -12,5 +12,10 @@ namespace Content.Server.AdminLog.LogEntries
         {
             Emote = emote;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Emote={Emote}";
+        }
     }
 }

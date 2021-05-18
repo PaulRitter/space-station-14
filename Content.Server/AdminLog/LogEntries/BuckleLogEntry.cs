@@ -26,6 +26,11 @@ namespace Content.Server.AdminLog.LogEntries
             Bucklee = bucklee;
             Target = target;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Buckler={Buckler} Bucklee={Bucklee} Target={Target}";
+        }
     }
 
     public class BuckleAttemptLogEntry : BaseBuckleLogEntry

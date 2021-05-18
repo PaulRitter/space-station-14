@@ -16,5 +16,10 @@ namespace Content.Server.AdminLog.LogEntries
             Message = message;
             Channel = channel;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Channel={Channel} Message={Message}";
+        }
     }
 }

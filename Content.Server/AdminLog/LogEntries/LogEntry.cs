@@ -15,6 +15,11 @@ namespace Content.Server.AdminLog.LogEntries
             EntityCoordinates = entityCoordinates;
             MapCoordinates = mapCoordinates;
         }
+
+        public override string ToString()
+        {
+            return $"[{Timestamp}] ({GetType()}) ({EntityCoordinates}) ({MapCoordinates})";
+        }
     }
 
     public abstract class LogEntryWithUser : LogEntry
@@ -24,6 +29,11 @@ namespace Content.Server.AdminLog.LogEntries
         protected LogEntryWithUser(DateTime timestamp, EntityCoordinates entityCoordinates, MapCoordinates mapCoordinates, string accountname) : base(timestamp, entityCoordinates, mapCoordinates)
         {
             Accountname = accountname;
+        }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} User='{Accountname}'";
         }
     }
 }

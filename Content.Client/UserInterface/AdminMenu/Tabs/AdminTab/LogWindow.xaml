@@ -1,0 +1,11 @@
+<SS14Window
+    xmlns="https://spacestation14.io">
+    <VBoxContainer>
+        <HBoxContainer>
+            <Button Name="AllButton" Text="All"></Button>
+            <Button Name="PointSelectorButton" Text="Point"></Button>
+            <Button Name="AreaSelectorButton" Text="Area"></Button>
+        </HBoxContainer>
+        <ScrollContainer Name="LogContainer"></ScrollContainer>
+    </VBoxContainer>
+</SS14Window>

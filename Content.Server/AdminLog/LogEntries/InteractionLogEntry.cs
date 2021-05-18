@@ -24,5 +24,10 @@ namespace Content.Server.AdminLog.LogEntries
             Type = type;
             Item = item;
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Target={Target} Type={Type} Item={(Item != null ? Item.ToString() : "None")}";
+        }
     }
 }

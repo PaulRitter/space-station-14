@@ -12,6 +12,11 @@ namespace Content.Server.AdminLog.LogEntries
         protected PullingLogEntry(DateTime timestamp, EntityCoordinates entityCoordinates, MapCoordinates mapCoordinates, [NotNull] string accountname) : base(timestamp, entityCoordinates, mapCoordinates, accountname)
         {
         }
+
+        public override string ToString()
+        {
+            return $"{base.ToString()} Target={Target}";
+        }
     }
 
     public class PullingStartLogEntry : PullingLogEntry
